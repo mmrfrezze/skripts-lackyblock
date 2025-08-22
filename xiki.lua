@@ -1,53 +1,166 @@
-local a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z=workspace,game.Players,game.Players.LocalPlayer,game:GetService("ReplicatedStorage"),game:GetService("UserInputService"),nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil,nil
-local A={"ChartreusePeriastron","IvoryPeriastron","SpectralSword","CrimsonPeriastron","SpecOmegaBiograftEnergySword","DualSpecGammaBiograftEnergySword","RainbowPeriastron","Illumina","DaggerOfShatteredDimensions","SpecZetaBiograftEnergySword","SpecGammaBiograftEnergySword","Magician'sCloak","Ice Dragon Slaying Sword","FireSword","CrescendoTheSoulStealer","FangOfTsuchigumo"}
-local function B(a)local b=c.Character.HumanoidRootPart local d=c.Character.HumanoidRootPart.CFrame for e=1,3 do c.Character.HumanoidRootPart.CFrame=b.CFrame*CFrame.new(0,0,1.1) task.wait() end task.wait(0.7) c.Character.HumanoidRootPart.CFrame=d end
-local function C()for a,b in pairs(c.Backpack:GetChildren())do for d,e in pairs(A)do if b.Name==e then b.Parent=c.Character end end end end
-local D=loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
-local E=D:CreateWindow({Name="🟣 Xiki | Lucky Block BG",LoadingTitle="Xiki UI",LoadingSubtitle="Modern & Clean Design",ConfigurationSaving={Enabled=true,FolderName="Xiki UI",FileName="LuckyBlock"},Discord={Enabled=false},KeySystem=false})
-local F=E:CreateTab("Character",4483362458)
-local G=E:CreateTab("Lucky Blocks",4483362458)
-local H=E:CreateTab("Clock Time",4483362458)
-local I=E:CreateTab("Advanced",4483362458)
-F:CreateSection("Movement")
-F:CreateSlider({Name="Walk Speed",Range={0,100},Increment=1,CurrentValue=16,Tooltip="Изменяет скорость передвижения",Callback=function(a) c.Character.Humanoid.WalkSpeed=a end})
-F:CreateButton({Name="Reset Walk Speed",Callback=function() c.Character.Humanoid.WalkSpeed=16 end})
-F:CreateSlider({Name="Jump Power",Range={0,1000},Increment=1,CurrentValue=50,Tooltip="Изменяет силу прыжка",Callback=function(a) c.Character.Humanoid.JumpPower=a end})
-F:CreateButton({Name="Reset Jump Power",Callback=function() c.Character.Humanoid.JumpPower=50 end})
-F:CreateToggle({Name="Infinite Jumps",CurrentValue=false,Tooltip="Позволяет прыгать бесконечно",Callback=function(a) f=a if a then e.JumpRequest:Connect(function() if f then c.Character.Humanoid:ChangeState("Jumping") end end) end end})
-F:CreateSection("Environment")
-F:CreateSlider({Name="Gravity",Range={0,1000},Increment=1,CurrentValue=196,Tooltip="Меняет силу гравитации",Callback=function(a) workspace.Gravity=a end})
-F:CreateButton({Name="Reset Gravity",Callback=function() workspace.Gravity=196 end})
-F:CreateSlider({Name="Field of View",Range={1,120},Increment=1,CurrentValue=70,Tooltip="Меняет FOV камеры",Callback=function(a) workspace.CurrentCamera.FieldOfView=a end})
-F:CreateButton({Name="Reset FOV",Callback=function() workspace.CurrentCamera.FieldOfView=70 end})
-local function J(a)d[a]:FireServer(1)end
-G:CreateSection("Default Lucky Block 🟩")
-G:CreateButton({Name="Spawn",Callback=function() J("SpawnLuckyBlock") end})
-G:CreateToggle({Name="Auto Spawn",CurrentValue=false,Callback=function(a) f=a; while f do task.wait(0.1) J("SpawnLuckyBlock") end end})
-G:CreateSection("Super Lucky Block 🟦")
-G:CreateButton({Name="Spawn",Callback=function() J("SpawnSuperBlock") end})
-G:CreateToggle({Name="Auto Spawn",CurrentValue=false,Callback=function(a) f=a; while f do task.wait(0.1) J("SpawnSuperBlock") end end})
-G:CreateSection("Diamond Lucky Block 💎")
-G:CreateButton({Name="Spawn",Callback=function() J("SpawnDiamondBlock") end})
-G:CreateToggle({Name="Auto Spawn",CurrentValue=false,Callback=function(a) f=a; while f do task.wait(0.1) J("SpawnDiamondBlock") end end})
-G:CreateSection("Rainbow Lucky Block 🌈")
-G:CreateButton({Name="Spawn",Callback=function() J("SpawnRainbowBlock") end})
-G:CreateToggle({Name="Auto Spawn",CurrentValue=false,Callback=function(a) f=a; while f do task.wait(0.1) J("SpawnRainbowBlock") end end})
-G:CreateSection("Galaxy Lucky Block 🌌")
-G:CreateButton({Name="Spawn",Callback=function() J("SpawnGalaxyBlock") end})
-G:CreateToggle({Name="Auto Spawn",CurrentValue=false,Callback=function(a) f=a; while f do task.wait(0.1) J("SpawnGalaxyBlock") end end})
-H:CreateButton({Name="Night",Callback=function() game.Lighting.ClockTime=0 end})
-H:CreateButton({Name="Day",Callback=function() game.Lighting.ClockTime=12 end})
-H:CreateButton({Name="Evening",Callback=function() game.Lighting.ClockTime=18 end})
-H:CreateButton({Name="Morning",Callback=function() game.Lighting.ClockTime=6 end})
-I:CreateSection("Weapons")
-I:CreateButton({Name="Equip All Tools",Callback=function() for a,b in pairs(c.Backpack:GetChildren())do b.Parent=c.Character task.wait() end end})
-I:CreateButton({Name="Insane Damage (Best Swords)",Callback=function() C() end})
-I:CreateSection("Combat")
-I:CreateButton({Name="Kill All",Callback=function() C() for a,b in pairs(b:GetPlayers())do if b.Character and b.Character:FindFirstChild("Humanoid")then if c.Character.Humanoid.Health>0 and b.Character.Humanoid.Health>0 then if not f or not c:IsFriendsWith(b.UserId)then B(b)end end end end end})
-I:CreateToggle({Name="Kill Aura",CurrentValue=false,Callback=function(a) if a then C() g=coroutine.create(function() while a do pcall(function() local a=c.Character and c.Character:FindFirstChild("HumanoidRootPart") if a then for b,d in pairs(b:GetPlayers())do if d~=c and d.Character and d.Character:FindFirstChild("HumanoidRootPart")then if(a.Position-d.Character.HumanoidRootPart.Position).Magnitude<=50 then if d.Character.Humanoid.Health>0 then if not f or not c:IsFriendsWith(d.UserId)then B(d)end end end end end end) task.wait(0.5) end end) coroutine.resume(g) elseif g then coroutine.close(g) g=nil end end})
-I:CreateSection("Teleportation")
-local K={} for a,b in pairs(b:GetPlayers())do if b~=c then table.insert(K,b.Name)end end
-I:CreateDropdown({Name="Teleport to Player",Options=K,Callback=function(a) local b=b:FindFirstChild(a) if b and b.Character and b.Character:FindFirstChild("HumanoidRootPart")then c.Character.HumanoidRootPart.CFrame=b.Character.HumanoidRootPart.CFrame+Vector3.new(0,3,0)end end})
-I:CreateButton({Name="Teleport All to Me",Callback=function() for a,b in pairs(b:GetPlayers())do if b~=c and b.Character and b.Character:FindFirstChild("HumanoidRootPart")then b.Character.HumanoidRootPart.CFrame=c.Character.HumanoidRootPart.CFrame+Vector3.new(0,3,0)end end end})
-I:CreateSection("Options")
-I:CreateToggle({Name="Whitelist Friends",CurrentValue=false,Callback=function(a) f=a end})
+local cam = workspace.CurrentCamera
+local plrs = game.Players
+local plr = plrs.LocalPlayer
+local replic = game:GetService("ReplicatedStorage")
+local uis = game:GetService("UserInputService")
+
+local as_dlb, as_slb, as_rlb, as_dimlb, as_glb
+local whitelistEn, infJump, aura
+local auraRadius = 50
+
+local bestSwords = {
+    "ChartreusePeriastron","IvoryPeriastron","SpectralSword","CrimsonPeriastron",
+    "SpecOmegaBiograftEnergySword","DualSpecGammaBiograftEnergySword","RainbowPeriastron",
+    "Illumina","DaggerOfShatteredDimensions","SpecZetaBiograftEnergySword",
+    "SpecGammaBiograftEnergySword","Magician'sCloak","Ice Dragon Slaying Sword",
+    "FireSword","CrescendoTheSoulStealer","FangOfTsuchigumo"
+}
+
+local function kill(target)
+    local hrp = target.Character.HumanoidRootPart
+    local lastCF = plr.Character.HumanoidRootPart.CFrame
+    for i = 1, 3 do
+        plr.Character.HumanoidRootPart.CFrame = hrp.CFrame * CFrame.new(0,0,1.1)
+        task.wait()
+    end
+    task.wait(0.7)
+    plr.Character.HumanoidRootPart.CFrame = lastCF
+end
+
+local function equipBest()
+    for _, tool in pairs(plr.Backpack:GetChildren()) do
+        for _, sword in pairs(bestSwords) do
+            if tool.Name == sword then
+                tool.Parent = plr.Character
+            end
+        end
+    end
+end
+
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+local Window = Rayfield:CreateWindow({
+    Name = "🟣 Xiki | Lucky Block BG",
+    LoadingTitle = "Xiki UI",
+    LoadingSubtitle = "Modern & Gradient Design",
+    ConfigurationSaving = {Enabled=true, FolderName="Xiki UI", FileName="LuckyBlock"},
+    Discord={Enabled=false},
+    KeySystem=false
+})
+
+local CharTab = Window:CreateTab("Character",4483362458)
+local LuckyTab = Window:CreateTab("Lucky Blocks",4483362458)
+local TimeTab = Window:CreateTab("Clock Time",4483362458)
+local AdvTab = Window:CreateTab("Advanced",4483362458)
+
+CharTab:CreateSection("Movement")
+CharTab:CreateSlider({Name="Walk Speed",Range={0,100},Increment=1,CurrentValue=16,Callback=function(v) plr.Character.Humanoid.WalkSpeed=v end})
+CharTab:CreateButton({Name="Reset Walk Speed",Callback=function() plr.Character.Humanoid.WalkSpeed=16 end})
+CharTab:CreateSlider({Name="Jump Power",Range={0,1000},Increment=1,CurrentValue=50,Callback=function(v) plr.Character.Humanoid.JumpPower=v end})
+CharTab:CreateButton({Name="Reset Jump Power",Callback=function() plr.Character.Humanoid.JumpPower=50 end})
+CharTab:CreateToggle({Name="Infinite Jumps",CurrentValue=false,Callback=function(v) infJump=v if v then uis.JumpRequest:Connect(function() if infJump then plr.Character.Humanoid:ChangeState("Jumping") end end) end end})
+
+CharTab:CreateSection("Environment")
+CharTab:CreateSlider({Name="Gravity",Range={0,1000},Increment=1,CurrentValue=196,Callback=function(v) workspace.Gravity=v end})
+CharTab:CreateButton({Name="Reset Gravity",Callback=function() workspace.Gravity=196 end})
+CharTab:CreateSlider({Name="Field of View",Range={1,120},Increment=1,CurrentValue=70,Callback=function(v) cam.FieldOfView=v end})
+CharTab:CreateButton({Name="Reset FOV",Callback=function() cam.FieldOfView=70 end})
+
+local function spawnBlock(event)
+    replic[event]:FireServer(1)
+end
+
+LuckyTab:CreateSection("Default Lucky Block 🟩")
+LuckyTab:CreateButton({Name="Spawn",Callback=function() spawnBlock("SpawnLuckyBlock") end})
+LuckyTab:CreateToggle({Name="Auto Spawn",CurrentValue=false,Callback=function(v) as_dlb=v while as_dlb do task.wait(0.1) spawnBlock("SpawnLuckyBlock") end end})
+
+LuckyTab:CreateSection("Super Lucky Block 🟦")
+LuckyTab:CreateButton({Name="Spawn",Callback=function() spawnBlock("SpawnSuperBlock") end})
+LuckyTab:CreateToggle({Name="Auto Spawn",CurrentValue=false,Callback=function(v) as_slb=v while as_slb do task.wait(0.1) spawnBlock("SpawnSuperBlock") end end})
+
+LuckyTab:CreateSection("Diamond Lucky Block 💎")
+LuckyTab:CreateButton({Name="Spawn",Callback=function() spawnBlock("SpawnDiamondBlock") end})
+LuckyTab:CreateToggle({Name="Auto Spawn",CurrentValue=false,Callback=function(v) as_dimlb=v while as_dimlb do task.wait(0.1) spawnBlock("SpawnDiamondBlock") end end})
+
+LuckyTab:CreateSection("Rainbow Lucky Block 🌈")
+LuckyTab:CreateButton({Name="Spawn",Callback=function() spawnBlock("SpawnRainbowBlock") end})
+LuckyTab:CreateToggle({Name="Auto Spawn",CurrentValue=false,Callback=function(v) as_rlb=v while as_rlb do task.wait(0.1) spawnBlock("SpawnRainbowBlock") end end})
+
+LuckyTab:CreateSection("Galaxy Lucky Block 🌌")
+LuckyTab:CreateButton({Name="Spawn",Callback=function() spawnBlock("SpawnGalaxyBlock") end})
+LuckyTab:CreateToggle({Name="Auto Spawn",CurrentValue=false,Callback=function(v) as_glb=v while as_glb do task.wait(0.1) spawnBlock("SpawnGalaxyBlock") end end})
+
+TimeTab:CreateButton({Name="Night",Callback=function() game.Lighting.ClockTime=0 end})
+TimeTab:CreateButton({Name="Day",Callback=function() game.Lighting.ClockTime=12 end})
+TimeTab:CreateButton({Name="Evening",Callback=function() game.Lighting.ClockTime=18 end})
+TimeTab:CreateButton({Name="Morning",Callback=function() game.Lighting.ClockTime=6 end})
+
+AdvTab:CreateSection("Weapons")
+AdvTab:CreateButton({Name="Equip All Tools",Callback=function() for _, tool in pairs(plr.Backpack:GetChildren()) do tool.Parent=plr.Character task.wait() end end})
+AdvTab:CreateButton({Name="Insane Damage (Best Swords)",Callback=function() equipBest() end})
+
+AdvTab:CreateSection("Combat")
+AdvTab:CreateButton({Name="Kill All",Callback=function()
+    equipBest()
+    for _, p in pairs(plrs:GetPlayers()) do
+        if p.Character and p.Character:FindFirstChild("Humanoid") then
+            if plr.Character.Humanoid.Health>0 and p.Character.Humanoid.Health>0 then
+                if not whitelistEn or not plr:IsFriendsWith(p.UserId) then
+                    kill(p)
+                end
+            end
+        end
+    end
+end})
+
+AdvTab:CreateToggle({Name="Kill Aura",CurrentValue=false,Callback=function(v)
+    if v then
+        equipBest()
+        aura = coroutine.create(function()
+            while v do
+                pcall(function()
+                    local hrp = plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
+                    if hrp then
+                        for _, p in pairs(plrs:GetPlayers()) do
+                            if p~=plr and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                                if (hrp.Position - p.Character.HumanoidRootPart.Position).Magnitude <= auraRadius then
+                                    if p.Character.Humanoid.Health>0 then
+                                        if not whitelistEn or not plr:IsFriendsWith(p.UserId) then
+                                            kill(p)
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end)
+                task.wait(0.5)
+            end
+        end)
+        coroutine.resume(aura)
+    elseif aura then
+        coroutine.close(aura)
+        aura=nil
+    end
+end})
+
+AdvTab:CreateSection("Teleportation")
+local playerNames = {}
+for _,p in pairs(plrs:GetPlayers()) do
+    if p~=plr then table.insert(playerNames,p.Name) end
+end
+AdvTab:CreateDropdown({Name="Teleport to Player",Options=playerNames,Callback=function(v)
+    local target = plrs:FindFirstChild(v)
+    if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+        plr.Character.HumanoidRootPart.CFrame = target.Character.HumanoidRootPart.CFrame + Vector3.new(0,3,0)
+    end
+end})
+AdvTab:CreateButton({Name="Teleport All to Me",Callback=function()
+    for _, p in pairs(plrs:GetPlayers()) do
+        if p~=plr and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+            p.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + Vector3.new(0,3,0)
+        end
+    end
+end})
+
+AdvTab:CreateSection("Options")
+AdvTab:CreateToggle({Name="Whitelist Friends",CurrentValue=false,Callback=function(v) whitelistEn=v end})
