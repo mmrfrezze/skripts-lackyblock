@@ -40,11 +40,11 @@ end
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
     Name = "Xiki | Lucky Block Battleground",
-    LoadingTitle = "Xiki Skripts",
+    LoadingTitle = "Xiki Skripts - лудший выбор",
     LoadingSubtitle = "by xikibamboni",
     ConfigurationSaving = {
         Enabled = true,
-        FolderName = "XikiHub",
+        FolderName = "Xiki Skripts",
         FileName = "LuckyBlock"
     },
     Discord = {Enabled = false},
