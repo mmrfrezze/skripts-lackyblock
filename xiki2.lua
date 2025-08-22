@@ -1,67 +1,80 @@
-local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
-local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local cam = workspace.Camera
+local plrs = game.Players
+local plr = plrs.LocalPlayer
+local uis = game:GetService("UserInputService")
 
--- ScreenGui
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "XikiSkriptsGUI"
-screenGui.ResetOnSpawn = false
-screenGui.Parent = PlayerGui
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local Window = Rayfield:CreateWindow({
+    Name = "🟣 Xiki | Lucky Block BG",
+    LoadingTitle = "Xiki UI",
+    LoadingSubtitle = "Modern & Clean Design",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "Xiki UI",
+        FileName = "LuckyBlock"
+    },
+    Discord = {Enabled = false},
+    KeySystem = false
+})
 
--- Фон
-local background = Instance.new("Frame")
-background.Size = UDim2.new(1,0,1,0)
-background.BackgroundColor3 = Color3.fromRGB(20,20,20)
-background.BackgroundTransparency = 1
-background.Parent = screenGui
+local CharTab = Window:CreateTab("Character", 4483362458)
+local LuckyTab = Window:CreateTab("Lucky Blocks", 4483362458)
+local TimeTab = Window:CreateTab("Clock Time", 4483362458)
+local AdvTab = Window:CreateTab("Advanced", 4483362458)
 
--- Панель меню
-local menuFrame = Instance.new("Frame")
-menuFrame.Size = UDim2.new(0,420,0,320)
-menuFrame.Position = UDim2.new(0.5,-210,0.5,-160)
-menuFrame.BackgroundColor3 = Color3.fromRGB(28,28,28)
-menuFrame.BackgroundTransparency = 1
-menuFrame.BorderSizePixel = 0
-menuFrame.Parent = screenGui
-menuFrame.ClipsDescendants = true
+-- Character Tab
+CharTab:CreateSection("Movement")
+CharTab:CreateSlider({Name="Walk Speed", Range={0,100}, Increment=1, CurrentValue=16, Tooltip="Изменяет скорость передвижения", Callback=function(v) end})
+CharTab:CreateButton({Name="Reset Walk Speed", Callback=function() end})
+CharTab:CreateSlider({Name="Jump Power", Range={0,1000}, Increment=1, CurrentValue=50, Tooltip="Изменяет силу прыжка", Callback=function(v) end})
+CharTab:CreateButton({Name="Reset Jump Power", Callback=function() end})
+CharTab:CreateToggle({Name="Infinite Jumps", CurrentValue=false, Tooltip="Позволяет прыгать бесконечно", Callback=function(v) end})
 
--- Заголовок
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1,0,0,50)
-title.Position = UDim2.new(0,0,0,0)
-title.BackgroundTransparency = 1
-title.Text = "🟣 Xiki | Lucky Block BG"
-title.TextColor3 = Color3.fromRGB(255,255,255)
-title.Font = Enum.Font.GothamBold
-title.TextScaled = true
-title.Parent = menuFrame
+CharTab:CreateSection("Environment")
+CharTab:CreateSlider({Name="Gravity", Range={0,1000}, Increment=1, CurrentValue=196, Tooltip="Меняет силу гравитации", Callback=function(v) end})
+CharTab:CreateButton({Name="Reset Gravity", Callback=function() end})
+CharTab:CreateSlider({Name="Field of View", Range={1,120}, Increment=1, CurrentValue=70, Tooltip="Меняет FOV камеры", Callback=function(v) end})
+CharTab:CreateButton({Name="Reset FOV", Callback=function() end})
 
--- Пример секций (визуально, как вкладки)
-local function createSection(name, yPos)
-    local section = Instance.new("TextLabel")
-    section.Size = UDim2.new(1,-20,0,30)
-    section.Position = UDim2.new(0,10,0,yPos)
-    section.BackgroundTransparency = 1
-    section.Text = name
-    section.TextColor3 = Color3.fromRGB(180,180,180)
-    section.Font = Enum.Font.GothamSemibold
-    section.TextSize = 20
-    section.TextXAlignment = Enum.TextXAlignment.Left
-    section.Parent = menuFrame
-end
+-- Lucky Blocks Tab
+LuckyTab:CreateSection("Default Lucky Block 🟩")
+LuckyTab:CreateButton({Name="Spawn", Callback=function() end})
+LuckyTab:CreateToggle({Name="Auto Spawn", CurrentValue=false, Callback=function(v) end})
 
-createSection("Character", 70)
-createSection("Lucky Blocks", 120)
-createSection("Clock Time", 170)
-createSection("Advanced", 220)
+LuckyTab:CreateSection("Super Lucky Block 🟦")
+LuckyTab:CreateButton({Name="Spawn", Callback=function() end})
+LuckyTab:CreateToggle({Name="Auto Spawn", CurrentValue=false, Callback=function(v) end})
 
--- Плавное появление GUI
-local function fadeInUI()
-    local bgTween = TweenService:Create(background, TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundTransparency = 0.5})
-    local menuTween = TweenService:Create(menuFrame, TweenInfo.new(1, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundTransparency = 0})
-    bgTween:Play()
-    menuTween:Play()
-end
+LuckyTab:CreateSection("Diamond Lucky Block 💎")
+LuckyTab:CreateButton({Name="Spawn", Callback=function() end})
+LuckyTab:CreateToggle({Name="Auto Spawn", CurrentValue=false, Callback=function(v) end})
 
-fadeInUI()
+LuckyTab:CreateSection("Rainbow Lucky Block 🌈")
+LuckyTab:CreateButton({Name="Spawn", Callback=function() end})
+LuckyTab:CreateToggle({Name="Auto Spawn", CurrentValue=false, Callback=function(v) end})
+
+LuckyTab:CreateSection("Galaxy Lucky Block 🌌")
+LuckyTab:CreateButton({Name="Spawn", Callback=function() end})
+LuckyTab:CreateToggle({Name="Auto Spawn", CurrentValue=false, Callback=function(v) end})
+
+-- Clock Time Tab
+TimeTab:CreateButton({Name="Night", Callback=function() end})
+TimeTab:CreateButton({Name="Day", Callback=function() end})
+TimeTab:CreateButton({Name="Evening", Callback=function() end})
+TimeTab:CreateButton({Name="Morning", Callback=function() end})
+
+-- Advanced Tab
+AdvTab:CreateSection("Weapons")
+AdvTab:CreateButton({Name="Equip All Tools", Callback=function() end})
+AdvTab:CreateButton({Name="Insane Damage (Best Swords)", Callback=function() end})
+
+AdvTab:CreateSection("Combat")
+AdvTab:CreateButton({Name="Kill All", Callback=function() end})
+AdvTab:CreateToggle({Name="Kill Aura", CurrentValue=false, Callback=function(v) end})
+
+AdvTab:CreateSection("Teleportation")
+AdvTab:CreateDropdown({Name="Teleport to Player", Options=function() return {} end, Callback=function(v) end})
+AdvTab:CreateButton({Name="Teleport All to Me", Callback=function() end})
+
+AdvTab:CreateSection("Options")
+AdvTab:CreateToggle({Name="Whitelist Friends", CurrentValue=false, Callback=function(v) end})
