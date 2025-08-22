@@ -54,7 +54,7 @@ local Window = Rayfield:CreateWindow({
 local CharTab = Window:CreateTab("Character", 4483362458)
 local LuckyTab = Window:CreateTab("Lucky Blocks", 4483362458)
 local TimeTab = Window:CreateTab("Clock Time", 4483362458)
-
+local AdvTab = Window:CreateTab("Advanced", 4483362458)
 
 CharTab:CreateSection("Movement")
 CharTab:CreateSlider({Name="Walk Speed", Range={0,100}, Increment=1, CurrentValue=16, Tooltip="Изменяет скорость передвижения", Callback=function(v) plr.Character.Humanoid.WalkSpeed=v end})
