@@ -3,14 +3,14 @@ local plr = plrs.LocalPlayer
 local uis = game:GetService("UserInputService")
 local workspace = game:GetService("Workspace")
 
-local infJump = false
+local jumpPower = 50
 local auraActive = false
 local auraRadius = 50
 
+plr.Character.Humanoid.JumpPower = jumpPower
+
 uis.JumpRequest:Connect(function()
-    if infJump then
-        plr.Character.Humanoid:ChangeState("Jumping")
-    end
+    plr.Character.Humanoid:ChangeState("Jumping")
 end)
 
 local function equipFirstTool()
@@ -82,11 +82,14 @@ local CharTab = Window:CreateTab("Character", 4483362458)
 local AdvTab = Window:CreateTab("Advanced", 4483362458)
 
 CharTab:CreateSection("Movement")
-CharTab:CreateToggle({Name="Infinite Jump", CurrentValue=false, Callback=function(v) infJump=v end})
+CharTab:CreateSlider({Name="Jump Power", Range={10,300}, Increment=1, CurrentValue=jumpPower, Callback=function(v)
+    jumpPower=v
+    plr.Character.Humanoid.JumpPower=v
+end})
 
 AdvTab:CreateSection("Combat")
 AdvTab:CreateToggle({Name="Kill Aura NPC", CurrentValue=false, Callback=function(v) toggleAura(v) end})
-AdvTab:CreateSlider({Name="Aura Radius", Range={5,100}, Increment=1, CurrentValue=50, Callback=function(v) auraRadius=v end})
+AdvTab:CreateSlider({Name="Aura Radius", Range={5,100}, Increment=1, CurrentValue=auraRadius, Callback=function(v) auraRadius=v end})
 AdvTab:CreateDropdown({Name="Teleport to Player", Options=function()
     local opts = {}
     for _, p in pairs(plrs:GetPlayers()) do
