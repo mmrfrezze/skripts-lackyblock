@@ -147,5 +147,27 @@ AdvTab:CreateToggle({Name="Kill Aura", CurrentValue=false, Callback=function(v)
     end
 end})
 
+AdvTab:CreateSection("Teleportation")
+AdvTab:CreateDropdown({Name="Teleport to Player", Options=function()
+    local opts = {}
+    for _, p in pairs(plrs:GetPlayers()) do
+        if p ~= plr then table.insert(opts,p.Name) end
+    end
+    return opts
+end, Callback=function(v)
+    local target = plrs:FindFirstChild(v)
+    if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+        plr.Character.HumanoidRootPart.CFrame = target.Character.HumanoidRootPart.CFrame + Vector3.new(0,3,0)
+    end
+end})
+
+AdvTab:CreateButton({Name="Teleport All to Me", Callback=function()
+    for _, p in pairs(plrs:GetPlayers()) do
+        if p~=plr and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+            p.Character.HumanoidRootPart.CFrame = plr.Character.HumanoidRootPart.CFrame + Vector3.new(0,3,0)
+        end
+    end
+end})
+
 AdvTab:CreateSection("Options")
 AdvTab:CreateToggle({Name="Whitelist Friends", CurrentValue=false, Callback=function(v) whitelistEn=v end})
