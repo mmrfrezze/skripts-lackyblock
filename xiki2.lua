@@ -1,3 +1,5 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/mmrfrezze/skripts-lackyblock/main/xiki2.lua"))()
+
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local Players = game:GetService("Players")
@@ -21,22 +23,18 @@ _G.AutoRaid = false
 _G.AutoMelee = false
 _G.AutoSword = false
 _G.AutoDefense = false
-
-local Window = Rayfield:CreateWindow({
-    Name = "XikiStudio v1.0",
-    LoadingTitle = "XikiStudio загружается...",
-    LoadingSubtitle = "by xikibamboni",
-    ConfigurationSaving = {Enabled = true, FolderName = "XikiStudio", FileName = "Config"},
-    KeySystem = false,
-})
-
-local MainTab = Window:CreateTab("Главная", 13014546637)
-local PlayerTab = Window:CreateTab("Игрок", 13014547629)
-local FarmTab = Window:CreateTab("Фарминг", 13014548637)
-local FruitTab = Window:CreateTab("Фрукты", 13014549637)
-local TeleportTab = Window:CreateTab("Телепорты", 13014550637)
-local CombatTab = Window:CreateTab("Бой", 13014551637)
-local InfoTab = Window:CreateTab("Информация", 13014552637)
+_G.FarmHeight = 15
+_G.AttackDistance = 20
+_G.AutoDodge = false
+_G.InfiniteJump = false
+_G.SpinBot = false
+_G.NoFog = false
+_G.FullBright = false
+_G.AutoAbility = false
+_G.AnchorTarget = false
+_G.HitSound = false
+_G.CustomFOV = false
+_G.FOVValue = 70
 
 function FindNearestNPC()
     local closestNPC = nil
@@ -151,6 +149,29 @@ function TeleportToBoss(bossName)
         LocalPlayer.Character.HumanoidRootPart.CFrame = bosses[bossName]
     end
 end
+
+function mouse1click()
+    VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 1)
+    task.wait(0.05)
+    VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 1)
+end
+
+local Window = Rayfield:CreateWindow({
+    Name = "XikiStudio v1.0",
+    LoadingTitle = "XikiStudio загружается...",
+    LoadingSubtitle = "by xikibamboni",
+    ConfigurationSaving = {Enabled = true, FolderName = "XikiStudio", FileName = "Config"},
+    KeySystem = false,
+})
+
+local MainTab = Window:CreateTab("Главная", 13014546637)
+local PlayerTab = Window:CreateTab("Игрок", 13014547629)
+local FarmTab = Window:CreateTab("Фарминг", 13014548637)
+local FruitTab = Window:CreateTab("Фрукты", 13014549637)
+local TeleportTab = Window:CreateTab("Телепорты", 13014550637)
+local CombatTab = Window:CreateTab("Бой", 13014551637)
+local VisualTab = Window:CreateTab("Визуал", 13014552637)
+local InfoTab = Window:CreateTab("Информация", 13014553637)
 
 MainTab:CreateButton({
     Name = "Перезагрузить интерфейс",
@@ -288,28 +309,65 @@ PlayerTab:CreateToggle({
     end
 })
 
+PlayerTab:CreateToggle({
+    Name = "Бесконечный прыжок",
+    CurrentValue = false,
+    Flag = "InfiniteJump",
+    Callback = function(Value)
+        _G.InfiniteJump = Value
+        if Value then
+            game:GetService("UserInputService").JumpRequest:Connect(function()
+                if _G.InfiniteJump and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+                    LocalPlayer.Character.Humanoid:ChangeState("Jumping")
+                end
+            end)
+        end
+    end
+})
+
+local FarmHeightSlider = FarmTab:CreateSlider({
+    Name = "Высота фарма",
+    Range = {5, 50},
+    Increment = 1,
+    Suffix = "studs",
+    CurrentValue = 15,
+    Flag = "FarmHeight",
+    Callback = function(Value)
+        _G.FarmHeight = Value
+    end
+})
+
+local AttackDistanceSlider = FarmTab:CreateSlider({
+    Name = "Дистанция атаки",
+    Range = {10, 100},
+    Increment = 1,
+    Suffix = "studs",
+    CurrentValue = 20,
+    Flag = "AttackDistance",
+    Callback = function(Value)
+        _G.AttackDistance = Value
+    end
+})
+
 FarmTab:CreateToggle({
     Name = "Авто-фарм NPC",
     CurrentValue = false,
     Flag = "AutoFarm",
     Callback = function(Value)
         _G.AutoFarm = Value
-        while _G.AutoFarm and task.wait() do
+        while _G.AutoFarm and task.wait(0.1) do
             pcall(function()
                 local target = FindNearestNPC()
                 if target and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
                     local hrp = LocalPlayer.Character.HumanoidRootPart
                     local targetPos = target.HumanoidRootPart.Position
-                    local farmHeight = 15
                     
-                    hrp.CFrame = CFrame.new(targetPos.X, targetPos.Y + farmHeight, targetPos.Z)
+                    hrp.CFrame = CFrame.new(targetPos.X, targetPos.Y + _G.FarmHeight, targetPos.Z)
                     
-                    VirtualInputManager:SendKeyEvent(true, "X", false, game)
-                    task.wait(0.1)
-                    VirtualInputManager:SendKeyEvent(false, "X", false, game)
-                    VirtualInputManager:SendKeyEvent(true, "C", false, game)
-                    task.wait(0.1)
-                    VirtualInputManager:SendKeyEvent(false, "C", false, game)
+                    local distance = (hrp.Position - targetPos).Magnitude
+                    if distance <= _G.AttackDistance then
+                        mouse1click()
+                    end
                 end
             end)
         end
@@ -538,6 +596,131 @@ CombatTab:CreateToggle({
                         end
                     end
                 end)
+            end
+        end
+    end
+})
+
+CombatTab:CreateToggle({
+    Name = "Авто-уворот",
+    CurrentValue = false,
+    Flag = "AutoDodge",
+    Callback = function(Value)
+        _G.AutoDodge = Value
+        while _G.AutoDodge and task.wait() do
+            pcall(function()
+                for _, projectile in pairs(Workspace:GetChildren()) do
+                    if projectile:FindFirstChild("Velocity") and (projectile.Name == "Projectile" or projectile:IsA("BasePart")) then
+                        local distance = (LocalPlayer.Character.HumanoidRootPart.Position - projectile.Position).Magnitude
+                        if distance < 10 then
+                            VirtualInputManager:SendKeyEvent(true, "Q", false, game)
+                            task.wait(0.1)
+                            VirtualInputManager:SendKeyEvent(false, "Q", false, game)
+                        end
+                    end
+                end
+            end)
+        end
+    end
+})
+
+CombatTab:CreateToggle({
+    Name = "Авто-способности",
+    CurrentValue = false,
+    Flag = "AutoAbility",
+    Callback = function(Value)
+        _G.AutoAbility = Value
+        while _G.AutoAbility and task.wait(1) do
+            VirtualInputManager:SendKeyEvent(true, "F", false, game)
+            task.wait(0.1)
+            VirtualInputManager:SendKeyEvent(false, "F", false, game)
+        end
+    end
+})
+
+CombatTab:CreateToggle({
+    Name = "Закрепить цель",
+    CurrentValue = false,
+    Flag = "AnchorTarget",
+    Callback = function(Value)
+        _G.AnchorTarget = Value
+        while _G.AnchorTarget and task.wait() do
+            pcall(function()
+                local target = FindNearestNPC()
+                if target and target:FindFirstChild("HumanoidRootPart") then
+                    target.HumanoidRootPart.Anchored = true
+                end
+            end)
+        end
+    end
+})
+
+VisualTab:CreateToggle({
+    Name = "Убрать туман",
+    CurrentValue = false,
+    Flag = "NoFog",
+    Callback = function(Value)
+        _G.NoFog = Value
+        if Value then
+            game:GetService("Lighting").FogEnd = 1000000
+        else
+            game:GetService("Lighting").FogEnd = 1000
+        end
+    end
+})
+
+VisualTab:CreateToggle({
+    Name = "Полная яркость",
+    CurrentValue = false,
+    Flag = "FullBright",
+    Callback = function(Value)
+        _G.FullBright = Value
+        if Value then
+            game:GetService("Lighting").GlobalShadows = false
+            game:GetService("Lighting").Brightness = 2
+        else
+            game:GetService("Lighting").GlobalShadows = true
+            game:GetService("Lighting").Brightness = 1
+        end
+    end
+})
+
+VisualTab:CreateToggle({
+    Name = "Звук попадания",
+    CurrentValue = false,
+    Flag = "HitSound",
+    Callback = function(Value)
+        _G.HitSound = Value
+    end
+})
+
+local FOVSlider = VisualTab:CreateSlider({
+    Name = "Поле зрения",
+    Range = {70, 120},
+    Increment = 1,
+    Suffix = "FOV",
+    CurrentValue = 70,
+    Flag = "FOVSlider",
+    Callback = function(Value)
+        _G.FOVValue = Value
+        if game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui") then
+            local camera = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Camera")
+            if camera then
+                camera.FieldOfView = _G.FOVValue
+            end
+        end
+    end
+})
+
+VisualTab:CreateToggle({
+    Name = "Спин-бот",
+    CurrentValue = false,
+    Flag = "SpinBot",
+    Callback = function(Value)
+        _G.SpinBot = Value
+        while _G.SpinBot and task.wait() do
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                LocalPlayer.Character.HumanoidRootPart.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(10), 0)
             end
         end
     end
