@@ -295,7 +295,8 @@ function CreateTargetESP(target)
     
     local ghostTrailParts = {}
     
-    -- Создаем основного призрака 1
+
+
     local ghost1 = Instance.new("Part")
     ghost1.Name = "XikiGhost1"
     ghost1.Size = Vector3.new(1.8, 1.8, 1.8)
@@ -307,7 +308,6 @@ function CreateTargetESP(target)
     ghost1.CanCollide = false
     ghost1.Parent = Workspace
     
-    -- Создаем основного призрака 2
     local ghost2 = Instance.new("Part")
     ghost2.Name = "XikiGhost2"
     ghost2.Size = Vector3.new(1.8, 1.8, 1.8)
@@ -319,7 +319,7 @@ function CreateTargetESP(target)
     ghost2.CanCollide = false
     ghost2.Parent = Workspace
     
-    -- Создаем следы для призраков (меньшие копии)
+   
     for i = 1, 5 do
         local trailPart1 = Instance.new("Part")
         trailPart1.Name = "XikiGhostTrail1_" .. i
@@ -365,24 +365,24 @@ function CreateTargetESP(target)
         local pos = target.HumanoidRootPart.Position
         local time = tick() * 2.5
         
-        -- Движение призраков вокруг цели (ноги-голова-тело)
-        local height1 = math.sin(time * 1.2) * 2 + 1.5  -- От ног до головы
-        local height2 = math.cos(time * 1.2) * 2 + 1.5  -- От ног до головы
+      
+        local height1 = math.sin(time * 1.2) * 2 + 1.5  
+        local height2 = math.cos(time * 1.2) * 2 + 1.5  
         
         ghost1.CFrame = CFrame.new(pos + Vector3.new(math.sin(time) * 3, height1, math.cos(time) * 3))
         ghost2.CFrame = CFrame.new(pos + Vector3.new(math.cos(time) * 3, height2, math.sin(time) * 3))
         
-        -- Сохраняем историю позиций для следов
+      
         table.insert(positionsHistory1, 1, ghost1.Position)
         table.insert(positionsHistory2, 1, ghost2.Position)
         
-        -- Ограничиваем историю
+       
         if #positionsHistory1 > 5 then
             table.remove(positionsHistory1, 6)
             table.remove(positionsHistory2, 6)
         end
         
-        -- Обновляем позиции следов
+        
         for i, trailParts in ipairs(ghostTrailParts) do
             if positionsHistory1[i] then
                 trailParts[1].CFrame = CFrame.new(positionsHistory1[i])
@@ -403,7 +403,7 @@ function RemoveTargetESP()
 end
 function CreateChineseHat()
     if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Head") then
-        -- Основа шляпы (плоский диск)
+
         local hatBase = Instance.new("Part")
         hatBase.Name = "XikiChineseHatBase"
         hatBase.Size = Vector3.new(3.5, 0.1, 3.5)
@@ -414,7 +414,7 @@ function CreateChineseHat()
         hatBase.Anchored = false
         hatBase.CanCollide = false
         
-        -- Изогнутая часть шляпы
+       
         local hatCurve = Instance.new("Part")
         hatCurve.Name = "XikiChineseHatCurve"
         hatCurve.Size = Vector3.new(2.8, 0.8, 2.8)
@@ -425,7 +425,7 @@ function CreateChineseHat()
         hatCurve.Anchored = false
         hatCurve.CanCollide = false
         
-        -- Верхушка шляпы
+       
         local hatTop = Instance.new("Part")
         hatTop.Name = "XikiChineseHatTop"
         hatTop.Size = Vector3.new(0.8, 0.8, 0.8)
@@ -436,21 +436,21 @@ function CreateChineseHat()
         hatTop.Anchored = false
         hatTop.CanCollide = false
         
-        -- Крепление основы
+        
         local weldBase = Instance.new("Weld")
         weldBase.Part0 = LocalPlayer.Character.Head
         weldBase.Part1 = hatBase
         weldBase.C0 = CFrame.new(0, 0.5, 0) * CFrame.Angles(0, 0, math.rad(90))
         weldBase.Parent = hatBase
         
-        -- Крепление изогнутой части
+       
         local weldCurve = Instance.new("Weld")
         weldCurve.Part0 = hatBase
         weldCurve.Part1 = hatCurve
         weldCurve.C0 = CFrame.new(0, -0.4, 0) * CFrame.Angles(math.rad(-15), 0, 0)
         weldCurve.Parent = hatCurve
         
-        -- Крепление верхушки
+        
         local weldTop = Instance.new("Weld")
         weldTop.Part0 = hatCurve
         weldTop.Part1 = hatTop
@@ -461,7 +461,7 @@ function CreateChineseHat()
         hatCurve.Parent = LocalPlayer.Character
         hatTop.Parent = LocalPlayer.Character
         
-        -- Свечение
+       
         local pointLight = Instance.new("PointLight")
         pointLight.Name = "XikiHatLight"
         pointLight.Color = _G.ClientColor
