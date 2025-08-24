@@ -1,5 +1,3 @@
-loadstring(game:HttpGet("https://raw.githubusercontent.com/mmrfrezze/skripts-lackyblock/main/xiki2.lua"))()
-
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local Players = game:GetService("Players")
