@@ -1,3 +1,5 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/mmrfrezze/skripts-lackyblock/main/xiki2.lua"))()
+
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local Players = game:GetService("Players")
@@ -46,8 +48,724 @@ _G.ChineseHat = false
 _G.JumpCircle = false
 _G.ClientColor = Color3.fromRGB(0, 255, 255)
 
-local correctKey = "H23F-RSF3-F33F-2FSA"
-local keyVerified = false
+local function CreateMainWindow()
+    local Window = Rayfield:CreateWindow({
+        Name = "XikiStudio v1.0",
+        LoadingTitle = "XikiStudio загружается...",
+        LoadingSubtitle = "by xikibamboni",
+        ConfigurationSaving = {Enabled = true, FolderName = "XikiStudio", FileName = "Config"},
+        KeySystem = false,
+    })
+
+    local MainTab = Window:CreateTab("Главная", 13014546637)
+    local PlayerTab = Window:CreateTab("Игрок", 13014547629)
+    local FarmTab = Window:CreateTab("Фарминг", 13014548637)
+    local FruitTab = Window:CreateTab("Фрукты", 13014549637)
+    local TeleportTab = Window:CreateTab("Телепорты", 13014550637)
+    local CombatTab = Window:CreateTab("Бой", 13014551637)
+    local VisualTab = Window:CreateTab("Визуал", 13014552637)
+    local InfoTab = Window:CreateTab("Информация", 13014553637)
+
+    MainTab:CreateButton({
+        Name = "Перезагрузить интерфейс",
+        Callback = function()
+            Rayfield:Destroy()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/mmrfrezze/skripts-lackyblock/main/xiki2.lua"))()
+        end
+    })
+
+    MainTab:CreateKeybind({
+        Name = "Переключить интерфейс",
+        CurrentKeybind = "Insert",
+        HoldToInteract = false,
+        Callback = function(Keybind)
+            Rayfield:Toggle()
+        end
+    })
+
+    MainTab:CreateButton({
+        Name = "Удалить интерфейс",
+        Callback = function()
+            Rayfield:Destroy()
+        end
+    })
+
+    local WalkSpeedSlider = PlayerTab:CreateSlider({
+        Name = "Скорость передвижения",
+        Range = {16, 250},
+        Increment = 1,
+        Suffix = "studs",
+        CurrentValue = 16,
+        Flag = "WalkSpeed",
+        Callback = function(Value)
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+                LocalPlayer.Character.Humanoid.WalkSpeed = Value
+            end
+        end
+    })
+
+    local JumpPowerSlider = PlayerTab:CreateSlider({
+        Name = "Сила прыжка",
+        Range = {50, 250},
+        Increment = 1,
+        Suffix = "studs",
+        CurrentValue = 50,
+        Flag = "JumpPower",
+        Callback = function(Value)
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+                LocalPlayer.Character.Humanoid.JumpPower = Value
+            end
+            end
+    })
+
+    PlayerTab:CreateToggle({
+        Name = "Бесконечная энергия",
+        CurrentValue = false,
+        Flag = "InfiniteEnergy",
+        Callback = function(Value)
+            _G.InfiniteStamina = Value
+            while _G.InfiniteStamina and task.wait() do
+                if LocalPlayer.Character then
+                    local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+                    if humanoid then
+                        humanoid:SetAttribute("Energy", 100)
+                    end
+                end
+            end
+        end
+    })
+
+    PlayerTab:CreateToggle({
+        Name = "Режим бога",
+        CurrentValue = false,
+        Flag = "GodMode",
+        Callback = function(Value)
+            if Value then
+                while Rayfield.Flags["GodMode"] and task.wait() do
+                    if LocalPlayer.Character then
+                        local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+                        if humanoid then
+                            humanoid.Health = humanoid.MaxHealth
+                        end
+                    end
+                end
+            end
+        end
+    })
+
+    PlayerTab:CreateToggle({
+        Name = "Ноклип",
+        CurrentValue = false,
+        Flag = "Noclip",
+        Callback = function(Value)
+            _G.Noclip = Value
+        end
+    })
+
+    PlayerTab:CreateToggle({
+        Name = "Полёт (WSAD+Space+Shift)",
+        CurrentValue = false,
+        Flag = "Fly",
+        Callback = function(Value)
+            if Value then
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/NickelHUBB/RobloxScript/main/Fly.lua"))()
+            end
+        end
+    })
+
+    PlayerTab:CreateToggle({
+        Name = "Хождение по воде",
+        CurrentValue = false,
+        Flag = "WalkOnWater",
+        Callback = function(Value)
+            _G.WalkOnWater = Value
+            if Value then
+                local part = Instance.new("Part")
+                part.Size = Vector3.new(100, 5, 100)
+                part.Transparency = 0.5
+                part.BrickColor = BrickColor.new("Cyan")
+                part.Anchored = true
+                part.CanCollide = true
+                part.Name = "XikiWaterWalk"
+                part.Parent = Workspace
+                
+                while _G.WalkOnWater and task.wait() do
+                    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                        part.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, -5, 0)
+                    end
+                end
+            else
+                if Workspace:FindFirstChild("XikiWaterWalk") then
+                    Workspace.XikiWaterWalk:Destroy()
+                end
+            end
+        end
+    })
+
+    PlayerTab:CreateToggle({
+        Name = "Бесконечный прыжок",
+        CurrentValue = false,
+        Flag = "InfiniteJump",
+        Callback = function(Value)
+            _G.InfiniteJump = Value
+            if Value then
+                game:GetService("UserInputService").JumpRequest:Connect(function()
+                    if _G.InfiniteJump and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+                        LocalPlayer.Character.Humanoid:ChangeState("Jumping")
+                    end
+                end)
+            end
+        end
+    })
+
+    local FlySpeedSlider = PlayerTab:CreateSlider({
+        Name = "Скорость полета",
+        Range = {20, 200},
+        Increment = 5,
+        Suffix = "studs",
+        CurrentValue = 50,
+        Flag = "FlySpeed",
+        Callback = function(Value)
+            _G.FlySpeed = Value
+        end
+    })
+
+    local FarmHeightSlider = FarmTab:CreateSlider({
+        Name = "Высота фарма",
+        Range = {5, 50},
+        Increment = 1,
+        Suffix = "studs",
+        CurrentValue = 15,
+        Flag = "FarmHeight",
+        Callback = function(Value)
+            _G.FarmHeight = Value
+        end
+    })
+
+    local AttackDistanceSlider = FarmTab:CreateSlider({
+        Name = "Дистанция атаки",
+        Range = {10, 100},
+        Increment = 1,
+        Suffix = "studs",
+        CurrentValue = 20,
+        Flag = "AttackDistance",
+        Callback = function(Value)
+            _G.AttackDistance = Value
+        end
+    })
+
+    FarmTab:CreateToggle({
+        Name = "Авто-фарм NPC",
+        CurrentValue = false,
+        Flag = "AutoFarm",
+        Callback = function(Value)
+            _G.AutoFarm = Value
+            while _G.AutoFarm and task.wait(0.1) do
+                pcall(function()
+                    local target = FindNearestNPC()
+                    if target and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                        local hrp = LocalPlayer.Character.HumanoidRootPart
+                        local targetPos = target.HumanoidRootPart.Position
+                        
+                        hrp.CFrame = CFrame.new(targetPos.X, targetPos.Y + _G.FarmHeight, targetPos.Z)
+                        
+                        local distance = (hrp.Position - targetPos).Magnitude
+                        if distance <= _G.AttackDistance then
+                            mouse1click()
+                        end
+                    end
+                end)
+            end
+        end
+    })
+
+    FarmTab:CreateToggle({
+        Name = "Авто-квесты",
+        CurrentValue = false,
+        Flag = "AutoQuest",
+        Callback = function(Value)
+            _G.AutoQuest = Value
+            while _G.AutoQuest and task.wait(3) do
+                pcall(function()
+                    CompleteQuest()
+                end)
+            end
+        end
+    })
+
+    FarmTab:CreateToggle({
+        Name = "Авто-продажа",
+        CurrentValue = false,
+        Flag = "AutoSell",
+        Callback = function(Value)
+            _G.AutoSell = Value
+            while _G.AutoSell and task.wait(5) do
+                pcall(function()
+                    local sellNPC = Workspace:FindFirstChild("Blackbeard") or Workspace:FindFirstChild("SellNPC")
+                    if sellNPC and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                        LocalPlayer.Character.HumanoidRootPart.CFrame = sellNPC:FindFirstChild("Head").CFrame + Vector3.new(0, 3, 0)
+                        wait(1)
+                        fireproximityprompt(sellNPC.Head.ProximityPrompt)
+                    end
+                end)
+            end
+        end
+    })
+
+    FarmTab:CreateToggle({
+        Name = "Авто-рейд",
+        CurrentValue = false,
+        Flag = "AutoRaid",
+        Callback = function(Value)
+            _G.AutoRaid = Value
+            while _G.AutoRaid and task.wait(5) do
+                pcall(function()
+                    local raidNPC = Workspace:FindFirstChild("Raids")
+                    if raidNPC and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                        LocalPlayer.Character.HumanoidRootPart.CFrame = raidNPC:FindFirstChild("Head").CFrame + Vector3.new(0, 3, 0)
+                        wait(1)
+                        fireproximityprompt(raidNPC.Head.ProximityPrompt)
+                    end
+                end)
+            end
+        end
+    })
+
+    FruitTab:CreateToggle({
+        Name = "ESP фруктов",
+        CurrentValue = false,
+        Flag = "FruitESP",
+        Callback = function(Value)
+            _G.FruitESP = Value
+            if Value then
+                while _G.FruitESP and task.wait(1) do
+                    RemoveESP()
+                    pcall(function()
+                        for _, fruit in pairs(FindFruits()) do
+                            CreateESP(fruit, Color3.fromRGB(255, 0, 0), fruit.Name)
+                        end
+                    end)
+                end
+            else
+                RemoveESP()
+            end
+        end
+    })
+
+    FruitTab:CreateToggle({
+        Name = "ESP игроков",
+        CurrentValue = false,
+        Flag = "PlayerESP",
+        Callback = function(Value)
+            _G.PlayerESP = Value
+            if Value then
+                while _G.PlayerESP and task.wait(2) do
+                    RemoveESP()
+                    pcall(function()
+                        for _, player in pairs(Players:GetPlayers()) do
+                            if player ~= LocalPlayer and player.Character then
+                                CreateESP(player.Character, Color3.fromRGB(0, 0, 255), player.Name)
+                            end
+                        end
+                    end)
+                end
+            else
+                RemoveESP()
+            end
+        end
+    })
+
+    FruitTab:CreateToggle({
+        Name = "Авто-сбор фруктов",
+        CurrentValue = false,
+        Flag = "AutoCollectFruits",
+        Callback = function(Value)
+            _G.AutoCollectFruits = Value
+            while _G.AutoCollectFruits and task.wait(0.5) do
+                pcall(function()
+                    for _, fruit in pairs(FindFruits()) do
+                        if fruit:FindFirstChild("Handle") then
+                            local distance = (LocalPlayer.Character.HumanoidRootPart.Position - fruit.Handle.Position).Magnitude
+                            if distance < 20 then
+                                firetouchinterest(LocalPlayer.Character.HumanoidRootPart, fruit.Handle, 0)
+                                task.wait()
+                                firetouchinterest(LocalPlayer.Character.HumanoidRootPart, fruit.Handle, 1)
+                            end
+                        end
+                    end
+                end)
+            end
+        end
+    })
+
+    FruitTab:CreateToggle({
+        Name = "Призыв всех фруктов",
+        CurrentValue = false,
+        Flag = "BringFruits",
+        Callback = function(Value)
+            _G.BringFruits = Value
+            while _G.BringFruits and task.wait(0.5) do
+                pcall(function()
+                    for _, fruit in pairs(FindFruits()) do
+                        if fruit:FindFirstChild("Handle") then
+                            fruit.Handle.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame
+                        end
+                    end
+                end)
+            end
+        end
+    })
+
+    local islands = {"Старый мир", "Пиратская деревня", "Пустыня", "Ледяной остров", "Военный форт", "Остров обезьян", "Средний мир", "Небесный остров", "Подводный город", "Фабрика", "Царство духов", "Новый мир", "Зо"}
+    TeleportTab:CreateDropdown({
+        Name = "Телепорт на остров",
+        Options = islands,
+        CurrentOption = "Старый мир",
+        Flag = "IslandDropdown",
+        Callback = function(Option)
+            TeleportToIsland(Option)
+            Rayfield:Notify({Title = "Телепортация", Content = "Телепортация на " .. Option, Duration = 3})
+        end
+    })
+
+    local bosses = {"Горбуччи", "Лейтенант", "Капитан", "Смокер", "Зоро", "Дон-Крейн", "Арлон", "Диабло", "Скайхо", "Адмирал"}
+    TeleportTab:CreateDropdown({
+        Name = "Телепорт к боссу",
+        Options = bosses,
+        CurrentOption = "Горбуччи",
+        Flag = "BossDropdown",
+        Callback = function(Option)
+            TeleportToBoss(Option)
+            Rayfield:Notify({Title = "Телепортация", Content = "Телепортация к " .. Option, Duration = 3})
+        end
+    })
+
+    local AuraRangeSlider = CombatTab:CreateSlider({
+        Name = "Дистанция ауры",
+        Range = {10, 50},
+        Increment = 1,
+        Suffix = "studs",
+        CurrentValue = 20,
+        Flag = "AuraRange",
+        Callback = function(Value)
+            _G.AuraRange = Value
+        end
+    })
+
+    CombatTab:CreateToggle({
+        Name = "Аура атаки",
+        CurrentValue = false,
+        Flag = "AttackAura",
+        Callback = function(Value)
+            _G.AuraActive = Value
+            while _G.AuraActive and task.wait(0.1) do
+                pcall(function()
+                    for _, npc in pairs(Workspace.Enemies:GetChildren()) do
+                        if npc:FindFirstChild("Humanoid") and npc:FindFirstChild("HumanoidRootPart") then
+                            local distance = (LocalPlayer.Character.HumanoidRootPart.Position - npc.HumanoidRootPart.Position).Magnitude
+                            if distance <= _G.AuraRange then
+                                mouse1click()
+                            end
+                        end
+                    end
+                end)
+            end
+        end
+    })
+
+    CombatTab:CreateToggle({
+        Name = "Авто-атака (Мело)",
+        CurrentValue = false,
+        Flag = "AutoMelee",
+        Callback = function(Value)
+            _G.AutoMelee = Value
+            while _G.AutoMelee and task.wait(0.2) do
+                VirtualInputManager:SendKeyEvent(true, "X", false, game)
+                task.wait(0.1)
+                VirtualInputManager:SendKeyEvent(false, "X", false, game)
+            end
+        end
+    })
+
+    CombatTab:CreateToggle({
+        Name = "Авто-атака (Меч)",
+        CurrentValue = false,
+        Flag = "AutoSword",
+        Callback = function(Value)
+            _G.AutoSword = Value
+            while _G.AutoSword and task.wait(0.3) do
+                VirtualInputManager:SendKeyEvent(true, "Z", false, game)
+                task.wait(0.1)
+                VirtualInputManager:SendKeyEvent(false, "Z", false, game)
+            end
+        end
+    })
+
+    CombatTab:CreateToggle({
+        Name = "Авто-защита",
+        CurrentValue = false,
+        Flag = "AutoDefense",
+        Callback = function(Value)
+            _G.AutoDefense = Value
+            while _G.AutoDefense and task.wait(0.5) do
+                VirtualInputManager:SendKeyEvent(true, "V", false, game)
+                task.wait(0.1)
+                VirtualInputManager:SendKeyEvent(false, "V", false, game)
+            end
+        end
+    })
+
+    CombatTab:CreateToggle({
+        Name = "Аура убийства",
+        CurrentValue = false,
+        Flag = "KillAura",
+        Callback = function(Value)
+            if Value then
+                while Rayfield.Flags["KillAura"] and task.wait(0.3) do
+                    pcall(function()
+                        for _, npc in pairs(Workspace.Enemies:GetChildren()) do
+                            if npc:FindFirstChild("Humanoid") and npc:FindFirstChild("HumanoidRootPart") then
+                                local distance = (LocalPlayer.Character.HumanoidRootPart.Position - npc.HumanoidRootPart.Position).Magnitude
+                                if distance < 30 then
+                                    VirtualInputManager:SendKeyEvent(true, "X", false, game)
+                                    task.wait(0.1)
+                                    VirtualInputManager:SendKeyEvent(false, "X", false, game)
+                                end
+                            end
+                        end
+                    end)
+                end
+            end
+        end
+    })
+
+    CombatTab:CreateToggle({
+        Name = "Авто-уворот",
+        CurrentValue = false,
+        Flag = "AutoDodge",
+        Callback = function(Value)
+            _G.AutoDodge = Value
+            while _G.AutoDodge and task.wait() do
+                pcall(function())
+                    for _, projectile in pairs(Workspace:GetChildren()) do
+                        if projectile:FindFirstChild("Velocity") and (projectile.Name == "Projectile" or projectile:IsA("BasePart")) then
+                            local distance = (LocalPlayer.Character.HumanoidRootPart.Position - projectile.Position).Magnitude
+                            if distance < 10 then
+                                VirtualInputManager:SendKeyEvent(true, "Q", false, game)
+                                task.wait(0.1)
+                                VirtualInputManager:SendKeyEvent(false, "Q", false, game)
+                            end
+                        end
+                    end
+                end)
+            end
+        end
+    })
+
+    CombatTab:CreateToggle({
+        Name = "Авто-способности",
+        CurrentValue = false,
+        Flag = "AutoAbility",
+        Callback = function(Value)
+            _G.AutoAbility = Value
+            while _G.AutoAbility and task.wait(1) do
+                VirtualInputManager:SendKeyEvent(true, "F", false, game)
+                task.wait(0.1)
+                VirtualInputManager:SendKeyEvent(false, "F", false, game)
+            end
+        end
+    })
+
+    CombatTab:CreateToggle({
+        Name = "Закрепить цель",
+        CurrentValue = false,
+        Flag = "AnchorTarget",
+        Callback = function(Value)
+            _G.AnchorTarget = Value
+            while _G.AnchorTarget and task.wait() do
+                pcall(function()
+                    local target = FindNearestNPC()
+                    if target and target:FindFirstChild("HumanoidRootPart") then
+                        target.HumanoidRootPart.Anchored = true
+                    end
+                end)
+            end
+        end
+    })
+
+    VisualTab:CreateToggle({
+        Name = "Убрать туман",
+        CurrentValue = false,
+        Flag = "NoFog",
+        Callback = function(Value)
+            _G.NoFog = Value
+            if Value then
+                game:GetService("Lighting").FogEnd = 1000000
+            else
+                game:GetService("Lighting").FogEnd = 1000
+            end
+        end
+    })
+
+    VisualTab:CreateToggle({
+        Name = "Полная яркость",
+        CurrentValue = false,
+        Flag = "FullBright",
+        Callback = function(Value)
+            _G.FullBright = Value
+            if Value then
+                game:GetService("Lighting").GlobalShadows = false
+                game:GetService("Lighting").Brightness = 2
+            else
+                game:GetService("Lighting").GlobalShadows = true
+                game:GetService("Lighting").Brightness = 1
+            end
+        end
+    })
+
+    VisualTab:CreateToggle({
+        Name = "Звук попадания",
+        CurrentValue = false,
+        Flag = "HitSound",
+        Callback = function(Value)
+            _G.HitSound = Value
+        end
+    })
+
+    VisualTab:CreateToggle({
+        Name = "Трейл",
+        CurrentValue = false,
+        Flag = "TrailEnabled",
+        Callback = function(Value)
+            _G.TrailEnabled = Value
+            if Value then
+                CreateTrail()
+            else
+                RemoveTrail()
+            end
+        end
+    })
+
+    VisualTab:CreateToggle({
+        Name = "Таргет ESP",
+        CurrentValue = false,
+        Flag = "TargetESP",
+        Callback = function(Value)
+            _G.TargetESP = Value
+            if Value then
+                while _G.TargetESP and task.wait(1) do
+                    RemoveTargetESP()
+                    pcall(function()
+                        local target = FindNearestNPC()
+                        if target then
+                            CreateTargetESP(target)
+                        end
+                    end)
+                end
+            else
+                RemoveTargetESP()
+            end
+        end
+    })
+
+    VisualTab:CreateToggle({
+        Name = "Китайская шляпа",
+        CurrentValue = false,
+        Flag = "ChineseHat",
+        Callback = function(Value)
+            _G.ChineseHat = Value
+            if Value then
+                CreateChineseHat()
+            else
+                RemoveChineseHat()
+            end
+        end
+    })
+
+    VisualTab:CreateToggle({
+        Name = "Прыжковый круг",
+        CurrentValue = false,
+        Flag = "JumpCircle",
+        Callback = function(Value)
+            _G.JumpCircle = Value
+        end
+    })
+
+    VisualTab:CreateColorPicker({
+        Name = "Цвет клиента",
+        Color = Color3.fromRGB(0, 255, 255),
+        Flag = "ClientColor",
+        Callback = function(Value)
+            _G.ClientColor = Value
+            if _G.TrailEnabled then
+                RemoveTrail()
+                CreateTrail()
+            end
+            if _G.ChineseHat then
+                RemoveChineseHat()
+                CreateChineseHat()
+            end
+        end
+    })
+
+    local FOVSlider = VisualTab:CreateSlider({
+        Name = "Поле зрения",
+        Range = {70, 120},
+        Increment = 1,
+        Suffix = "FOV",
+        CurrentValue = 70,
+        Flag = "FOVSlider",
+        Callback = function(Value)
+            _G.FOVValue = Value
+            if game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui") then
+                local camera = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Camera")
+                if camera then
+                    camera.FieldOfView = _G.FOVValue
+                end
+            end
+        end
+    })
+
+    VisualTab:CreateToggle({
+        Name = "Спин-бот",
+        CurrentValue = false,
+        Flag = "SpinBot",
+        Callback = function(Value)
+            _G.SpinBot = Value
+            while _G.SpinBot and task.wait() do
+                if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                    LocalPlayer.Character.HumanoidRootPart.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(10), 0)
+                end
+            end
+        end
+    })
+
+    InfoTab:CreateLabel("XikiStudio v1.0")
+    InfoTab:CreateLabel("by xikibamboni")
+    InfoTab:CreateLabel("Используйте на свой страх и риск!")
+
+    InfoTab:CreateButton({
+        Name = "Скопировать YouTube",
+        Callback = function()
+            setclipboard("https://www.youtube.com/@xikibamboni-ghost")
+            Rayfield:Notify({Title = "YouTube", Content = "Ссылка скопирована!", Duration = 3})
+        end
+    })
+
+    InfoTab:CreateButton({
+        Name = "Скопировать Discord",
+        Callback = function()
+            setclipboard("https://discord.gg/H3525BkxTC")
+            Rayfield:Notify({Title = "Discord", Content = "Ссылка скопирована!", Duration = 3})
+        end
+    })
+
+    Rayfield:Notify({
+        Title = "XikiStudio загружен!",
+        Content = "Успешно внедрен. Удачного использования!",
+        Duration = 5,
+    })
+end
 
 local KeyWindow = Rayfield:CreateWindow({
     Name = "XikiStudio - Key System",
@@ -62,7 +780,7 @@ local KeyWindow = Rayfield:CreateWindow({
         FileName = "XikiKey",
         SaveKey = true,
         GrabKeyFromSite = false,
-        Key = {correctKey}
+        Key = {"H23F-RSF3-F33F-2FSA"}
     }
 })
 
@@ -72,7 +790,12 @@ KeyWindow:Prompt({
     Content = "Ключ можно получить в нашем Discord сервере"
 })
 
-if not keyVerified then return end
+task.wait(2)
+
+if Rayfield.Flags then
+    KeyWindow:Destroy()
+    CreateMainWindow()
+end
 
 function FindNearestNPC()
     local closestNPC = nil
@@ -194,103 +917,6 @@ function mouse1click()
     VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 1)
 end
 
-function FlyToTarget(target, height)
-    if not target or not target:FindFirstChild("HumanoidRootPart") then return end
-    
-    local targetPos = target.HumanoidRootPart.Position
-    local flyPos = Vector3.new(targetPos.X, targetPos.Y + height, targetPos.Z)
-    
-    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        local tween = TweenService:Create(
-            LocalPlayer.Character.HumanoidRootPart,
-            TweenInfo.new(0.5, Enum.EasingStyle.Linear),
-            {CFrame = CFrame.new(flyPos)}
-        )
-        tween:Play()
-        tween.Completed:Wait()
-        
-        local distance = (LocalPlayer.Character.HumanoidRootPart.Position - targetPos).Magnitude
-        if distance <= _G.AttackDistance then
-            mouse1click()
-        end
-    end
-end
-
-function CreateFlyPlatform()
-    if _G.FlyPlatform then _G.FlyPlatform:Destroy() end
-    
-    _G.FlyPlatform = Instance.new("Part")
-    _G.FlyPlatform.Size = Vector3.new(4, 0.5, 4)
-    _G.FlyPlatform.Transparency = 1
-    _G.FlyPlatform.Anchored = true
-    _G.FlyPlatform.CanCollide = true
-    _G.FlyPlatform.Name = "XikiFlyPlatform"
-    _G.FlyPlatform.Parent = Workspace
-    
-    return _G.FlyPlatform
-end
-
-function StartFlying()
-    _G.Flying = true
-    local platform = CreateFlyPlatform()
-    local bodyVelocity = Instance.new("BodyVelocity")
-    bodyVelocity.Velocity = Vector3.new(0, 0, 0)
-    bodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
-    bodyVelocity.Parent = LocalPlayer.Character.HumanoidRootPart
-    
-    local flyConnection
-    flyConnection = RunService.Heartbeat:Connect(function()
-        if not _G.Flying or not LocalPlayer.Character then
-            flyConnection:Disconnect()
-            return
-        end
-        
-        local hrp = LocalPlayer.Character.HumanoidRootPart
-        local camera = Workspace.CurrentCamera
-        local moveDirection = Vector3.new(0, 0, 0)
-        
-        if UserInputService:IsKeyDown(Enum.KeyCode.W) then
-            moveDirection = moveDirection + camera.CFrame.LookVector
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.S) then
-            moveDirection = moveDirection - camera.CFrame.LookVector
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.A) then
-            moveDirection = moveDirection - camera.CFrame.RightVector
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.D) then
-            moveDirection = moveDirection + camera.CFrame.RightVector
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
-            moveDirection = moveDirection + Vector3.new(0, 1, 0)
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then
-            moveDirection = moveDirection - Vector3.new(0, 1, 0)
-        end
-        
-        if moveDirection.Magnitude > 0 then
-            moveDirection = moveDirection.Unit * _G.FlySpeed
-        end
-        
-        bodyVelocity.Velocity = moveDirection
-        platform.CFrame = hrp.CFrame * CFrame.new(0, -3, 0)
-    end)
-end
-
-function StopFlying()
-    _G.Flying = false
-    if _G.FlyPlatform then
-        _G.FlyPlatform:Destroy()
-        _G.FlyPlatform = nil
-    end
-    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        local bodyVelocity = LocalPlayer.Character.HumanoidRootPart:FindFirstChild("BodyVelocity")
-        if bodyVelocity then
-            bodyVelocity:Destroy()
-        end
-    end
-end
-
 function CreateTrail()
     if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
         local trail = Instance.new("Trail")
@@ -298,10 +924,11 @@ function CreateTrail()
         trail.Color = ColorSequence.new(_G.ClientColor)
         trail.Attachment0 = Instance.new("Attachment")
         trail.Attachment0.Name = "TrailAttachment0"
+        trail.Attachment0.Position = Vector3.new(-1, 0, 0)
         trail.Attachment0.Parent = LocalPlayer.Character.HumanoidRootPart
         trail.Attachment1 = Instance.new("Attachment")
         trail.Attachment1.Name = "TrailAttachment1"
-        trail.Attachment1.Position = Vector3.new(0, 2, 0)
+        trail.Attachment1.Position = Vector3.new(1, 0, 0)
         trail.Attachment1.Parent = LocalPlayer.Character.HumanoidRootPart
         trail.Lifetime = 0.5
         trail.Transparency = NumberSequence.new(0.5)
@@ -405,717 +1032,12 @@ function CreateJumpCircle()
     end
 end
 
-local Window = Rayfield:CreateWindow({
-    Name = "XikiStudio v1.0",
-    LoadingTitle = "XikiStudio загружается...",
-    LoadingSubtitle = "by xikibamboni",
-    ConfigurationSaving = {Enabled = true, FolderName = "XikiStudio", FileName = "Config"},
-    KeySystem = false,
-})
-
-local MainTab = Window:CreateTab("Главная", 13014546637)
-local PlayerTab = Window:CreateTab("Игрок", 13014547629)
-local FarmTab = Window:CreateTab("Фарминг", 13014548637)
-local FruitTab = Window:CreateTab("Фрукты", 13014549637)
-local TeleportTab = Window:CreateTab("Телепорты", 13014550637)
-local CombatTab = Window:CreateTab("Бой", 13014551637)
-local VisualTab = Window:CreateTab("Визуал", 13014552637)
-local InfoTab = Window:CreateTab("Информация", 13014553637)
-
-MainTab:CreateButton({
-    Name = "Перезагрузить интерфейс",
-    Callback = function()
-        Rayfield:Destroy()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/mmrfrezze/skripts-lackyblock/main/xiki2.lua"))()
-    end
-})
-
-MainTab:CreateKeybind({
-    Name = "Переключить интерфейс",
-    CurrentKeybind = "Insert",
-    HoldToInteract = false,
-    Callback = function(Keybind)
-        Rayfield:Toggle()
-    end
-})
-
-MainTab:CreateButton({
-    Name = "Удалить интерфейс",
-    Callback = function()
-        Rayfield:Destroy()
-    end
-})
-
-local WalkSpeedSlider = PlayerTab:CreateSlider({
-    Name = "Скорость передвижения",
-    Range = {16, 250},
-    Increment = 1,
-    Suffix = "studs",
-    CurrentValue = 16,
-    Flag = "WalkSpeed",
-    Callback = function(Value)
-        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-            LocalPlayer.Character.Humanoid.WalkSpeed = Value
-        end
-    end
-})
-
-local JumpPowerSlider = PlayerTab:CreateSlider({
-    Name = "Сила прыжка",
-    Range = {50, 250},
-    Increment = 1,
-    Suffix = "studs",
-    CurrentValue = 50,
-    Flag = "JumpPower",
-    Callback = function(Value)
-        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-            LocalPlayer.Character.Humanoid.JumpPower = Value
-        end
-    end
-})
-
-PlayerTab:CreateToggle({
-    Name = "Бесконечная энергия",
-    CurrentValue = false,
-    Flag = "InfiniteEnergy",
-    Callback = function(Value)
-        _G.InfiniteStamina = Value
-        while _G.InfiniteStamina and task.wait() do
-            if LocalPlayer.Character then
-                local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
-                if humanoid then
-                    humanoid:SetAttribute("Energy", 100)
-                end
-            end
-        end
-    end
-})
-
-PlayerTab:CreateToggle({
-    Name = "Режим бога",
-    CurrentValue = false,
-    Flag = "GodMode",
-    Callback = function(Value)
-        if Value then
-            while Rayfield.Flags["GodMode"] and task.wait() do
-                if LocalPlayer.Character then
-                    local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
-                    if humanoid then
-                        humanoid.Health = humanoid.MaxHealth
-                    end
-                end
-            end
-        end
-    end
-})
-
-PlayerTab:CreateToggle({
-    Name = "Ноклип",
-    CurrentValue = false,
-    Flag = "Noclip",
-    Callback = function(Value)
-        _G.Noclip = Value
-    end
-})
-
-PlayerTab:CreateToggle({
-    Name = "Полёт (WSAD+Space+Shift)",
-    CurrentValue = false,
-    Flag = "Fly",
-    Callback = function(Value)
-        if Value then
-            StartFlying()
-        else
-            StopFlying()
-        end
-    end
-})
-
-PlayerTab:CreateToggle({
-    Name = "Хождение по воде",
-    CurrentValue = false,
-    Flag = "WalkOnWater",
-    Callback = function(Value)
-        _G.WalkOnWater = Value
-        if Value then
-            local part = Instance.new("Part")
-            part.Size = Vector3.new(100, 5, 100)
-            part.Transparency = 0.5
-            part.BrickColor = BrickColor.new("Cyan")
-            part.Anchored = true
-            part.CanCollide = true
-            part.Name = "XikiWaterWalk"
-            part.Parent = Workspace
-            
-            while _G.WalkOnWater and task.wait() do
-                if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                    part.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, -5, 0)
-                end
-            end
-        else
-            if Workspace:FindFirstChild("XikiWaterWalk") then
-                Workspace.XikiWaterWalk:Destroy()
-            end
-        end
-    end
-})
-
-PlayerTab:CreateToggle({
-    Name = "Бесконечный прыжок",
-    CurrentValue = false,
-    Flag = "InfiniteJump",
-    Callback = function(Value)
-        _G.InfiniteJump = Value
-        if Value then
-            game:GetService("UserInputService").JumpRequest:Connect(function()
-                if _G.InfiniteJump and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-                    LocalPlayer.Character.Humanoid:ChangeState("Jumping")
-                end
-            end)
-        end
-    end
-})
-
-local FlySpeedSlider = PlayerTab:CreateSlider({
-    Name = "Скорость полета",
-    Range = {20, 200},
-    Increment = 5,
-    Suffix = "studs",
-    CurrentValue = 50,
-    Flag = "FlySpeed",
-    Callback = function(Value)
-        _G.FlySpeed = Value
-    end
-})
-
-local FarmHeightSlider = FarmTab:CreateSlider({
-    Name = "Высота фарма",
-    Range = {5, 50},
-    Increment = 1,
-    Suffix = "studs",
-    CurrentValue = 15,
-    Flag = "FarmHeight",
-    Callback = function(Value)
-        _G.FarmHeight = Value
-    end
-})
-
-local AttackDistanceSlider = FarmTab:CreateSlider({
-    Name = "Дистанция атаки",
-    Range = {10, 100},
-    Increment = 1,
-    Suffix = "studs",
-    CurrentValue = 20,
-    Flag = "AttackDistance",
-    Callback = function(Value)
-        _G.AttackDistance = Value
-    end
-})
-
-FarmTab:CreateToggle({
-    Name = "Авто-фарм NPC",
-    CurrentValue = false,
-    Flag = "AutoFarm",
-    Callback = function(Value)
-        _G.AutoFarm = Value
-        while _G.AutoFarm and task.wait(0.1) do
-            pcall(function()
-                local target = FindNearestNPC()
-                if target and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                    FlyToTarget(target, _G.FarmHeight)
-                end
-            end)
-        end
-    end
-})
-
-FarmTab:CreateToggle({
-    Name = "Авто-квесты",
-    CurrentValue = false,
-    Flag = "AutoQuest",
-    Callback = function(Value)
-        _G.AutoQuest = Value
-        while _G.AutoQuest and task.wait(3) do
-            pcall(function()
-                CompleteQuest()
-            end)
-        end
-    end
-})
-
-FarmTab:CreateToggle({
-    Name = "Авто-продажа",
-    CurrentValue = false,
-    Flag = "AutoSell",
-    Callback = function(Value)
-        _G.AutoSell = Value
-        while _G.AutoSell and task.wait(5) do
-            pcall(function()
-                local sellNPC = Workspace:FindFirstChild("Blackbeard") or Workspace:FindFirstChild("SellNPC")
-                if sellNPC and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                    LocalPlayer.Character.HumanoidRootPart.CFrame = sellNPC:FindFirstChild("Head").CFrame + Vector3.new(0, 3, 0)
-                    wait(1)
-                    fireproximityprompt(sellNPC.Head.ProximityPrompt)
-                end
-            end)
-        end
-    end
-})
-
-FarmTab:CreateToggle({
-    Name = "Авто-рейд",
-    CurrentValue = false,
-    Flag = "AutoRaid",
-    Callback = function(Value)
-        _G.AutoRaid = Value
-        while _G.AutoRaid and task.wait(5) do
-            pcall(function()
-                local raidNPC = Workspace:FindFirstChild("Raids")
-                if raidNPC and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                    LocalPlayer.Character.HumanoidRootPart.CFrame = raidNPC:FindFirstChild("Head").CFrame + Vector3.new(0, 3, 0)
-                    wait(1)
-                    fireproximityprompt(raidNPC.Head.ProximityPrompt)
-                end
-            end)
-        end
-    end
-})
-
-FruitTab:CreateToggle({
-    Name = "ESP фруктов",
-    CurrentValue = false,
-    Flag = "FruitESP",
-    Callback = function(Value)
-        _G.FruitESP = Value
-        if Value then
-            while _G.FruitESP and task.wait(1) do
-                RemoveESP()
-                pcall(function()
-                    for _, fruit in pairs(FindFruits()) do
-                        CreateESP(fruit, Color3.fromRGB(255, 0, 0), fruit.Name)
-                    end
-                end)
-            end
-        else
-            RemoveESP()
-        end
-    end
-})
-
-FruitTab:CreateToggle({
-    Name = "ESP игроков",
-    CurrentValue = false,
-    Flag = "PlayerESP",
-    Callback = function(Value)
-        _G.PlayerESP = Value
-        if Value then
-            while _G.PlayerESP and task.wait(2) do
-                RemoveESP()
-                pcall(function()
-                    for _, player in pairs(Players:GetPlayers()) do
-                        if player ~= LocalPlayer and player.Character then
-                            CreateESP(player.Character, Color3.fromRGB(0, 0, 255), player.Name)
-                        end
-                    end
-                end)
-            end
-        else
-            RemoveESP()
-        end
-    end
-})
-
-FruitTab:CreateToggle({
-    Name = "Авто-сбор фруктов",
-    CurrentValue = false,
-    Flag = "AutoCollectFruits",
-    Callback = function(Value)
-        _G.AutoCollectFruits = Value
-        while _G.AutoCollectFruits and task.wait(0.5) do
-            pcall(function()
-                for _, fruit in pairs(FindFruits()) do
-                    if fruit:FindFirstChild("Handle") then
-                        local distance = (LocalPlayer.Character.HumanoidRootPart.Position - fruit.Handle.Position).Magnitude
-                        if distance < 20 then
-                            firetouchinterest(LocalPlayer.Character.HumanoidRootPart, fruit.Handle, 0)
-                            task.wait()
-                            firetouchinterest(LocalPlayer.Character.HumanoidRootPart, fruit.Handle, 1)
-                        end
-                    end
-                end
-            end)
-        end
-    end
-})
-
-FruitTab:CreateToggle({
-    Name = "Призыв всех фруктов",
-    CurrentValue = false,
-    Flag = "BringFruits",
-    Callback = function(Value)
-        _G.BringFruits = Value
-        while _G.BringFruits and task.wait(0.5) do
-            pcall(function()
-                for _, fruit in pairs(FindFruits()) do
-                    if fruit:FindFirstChild("Handle") then
-                        fruit.Handle.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame
-                    end
-                end
-            end)
-        end
-    end
-})
-
-local islands = {"Старый мир", "Пиратская деревня", "Пустыня", "Ледяной остров", "Военный форт", "Остров обезьян", "Средний мир", "Небесный остров", "Подводный город", "Фабрика", "Царство духов", "Новый мир", "Зо"}
-TeleportTab:CreateDropdown({
-    Name = "Телепорт на остров",
-    Options = islands,
-    CurrentOption = "Старый мир",
-    Flag = "IslandDropdown",
-    Callback = function(Option)
-        TeleportToIsland(Option)
-        Rayfield:Notify({Title = "Телепортация", Content = "Телепортация на " .. Option, Duration = 3})
-    end
-})
-
-local bosses = {"Горбуччи", "Лейтенант", "Капитан", "Смокер", "Зоро", "Дон-Крейн", "Арлон", "Диабло", "Скайхо", "Адмирал"}
-TeleportTab:CreateDropdown({
-    Name = "Телепорт к боссу",
-    Options = bosses,
-    CurrentOption = "Горбуччи",
-    Flag = "BossDropdown",
-    Callback = function(Option)
-        TeleportToBoss(Option)
-        Rayfield:Notify({Title = "Телепортация", Content = "Телепортация к " .. Option, Duration = 3})
-    end
-})
-
-local AuraRangeSlider = CombatTab:CreateSlider({
-    Name = "Дистанция ауры",
-    Range = {10, 50},
-    Increment = 1,
-    Suffix = "studs",
-    CurrentValue = 20,
-    Flag = "AuraRange",
-    Callback = function(Value)
-        _G.AuraRange = Value
-    end
-})
-
-CombatTab:CreateToggle({
-    Name = "Аура атаки",
-    CurrentValue = false,
-    Flag = "AttackAura",
-    Callback = function(Value)
-        _G.AuraActive = Value
-        while _G.AuraActive and task.wait(0.1) do
-            pcall(function()
-                for _, npc in pairs(Workspace.Enemies:GetChildren()) do
-                    if npc:FindFirstChild("Humanoid") and npc:FindFirstChild("HumanoidRootPart") then
-                        local distance = (LocalPlayer.Character.HumanoidRootPart.Position - npc.HumanoidRootPart.Position).Magnitude
-                        if distance <= _G.AuraRange then
-                            mouse1click()
-                        end
-                    end
-                end
-            end)
-        end
-    end
-})
-
-CombatTab:CreateToggle({
-    Name = "Авто-атака (Мело)",
-    CurrentValue = false,
-    Flag = "AutoMelee",
-    Callback = function(Value)
-        _G.AutoMelee = Value
-        while _G.AutoMelee and task.wait(0.2) do
-            VirtualInputManager:SendKeyEvent(true, "X", false, game)
-            task.wait(0.1)
-            VirtualInputManager:SendKeyEvent(false, "X", false, game)
-        end
-    end
-})
-
-CombatTab:CreateToggle({
-    Name = "Авто-атака (Меч)",
-    CurrentValue = false,
-    Flag = "AutoSword",
-    Callback = function(Value)
-        _G.AutoSword = Value
-        while _G.AutoSword and task.wait(0.3) do
-            VirtualInputManager:SendKeyEvent(true, "Z", false, game)
-            task.wait(0.1)
-            VirtualInputManager:SendKeyEvent(false, "Z", false, game)
-        end
-    end
-})
-
-CombatTab:CreateToggle({
-    Name = "Авто-защита",
-    CurrentValue = false,
-    Flag = "AutoDefense",
-    Callback = function(Value)
-        _G.AutoDefense = Value
-        while _G.AutoDefense and task.wait(0.5) do
-            VirtualInputManager:SendKeyEvent(true, "V", false, game)
-            task.wait(0.1)
-            VirtualInputManager:SendKeyEvent(false, "V", false, game)
-        end
-    end
-})
-
-CombatTab:CreateToggle({
-    Name = "Аура убийства",
-    CurrentValue = false,
-    Flag = "KillAura",
-    Callback = function(Value)
-        if Value then
-            while Rayfield.Flags["KillAura"] and task.wait(0.3) do
-                pcall(function()
-                    for _, npc in pairs(Workspace.Enemies:GetChildren()) do
-                        if npc:FindFirstChild("Humanoid") and npc:FindFirstChild("HumanoidRootPart") then
-                            local distance = (LocalPlayer.Character.HumanoidRootPart.Position - npc.HumanoidRootPart.Position).Magnitude
-                            if distance < 30 then
-                                VirtualInputManager:SendKeyEvent(true, "X", false, game)
-                                task.wait(0.1)
-                                VirtualInputManager:SendKeyEvent(false, "X", false, game)
-                            end
-                        end
-                    end
-                end)
-            end
-        end
-    end
-})
-
-CombatTab:CreateToggle({
-    Name = "Авто-уворот",
-    CurrentValue = false,
-    Flag = "AutoDodge",
-    Callback = function(Value)
-        _G.AutoDodge = Value
-        while _G.AutoDodge and task.wait() do
-            pcall(function()
-                for _, projectile in pairs(Workspace:GetChildren()) do
-                    if projectile:FindFirstChild("Velocity") and (projectile.Name == "Projectile" or projectile:IsA("BasePart")) then
-                        local distance = (LocalPlayer.Character.HumanoidRootPart.Position - projectile.Position).Magnitude
-                        if distance < 10 then
-                            VirtualInputManager:SendKeyEvent(true, "Q", false, game)
-                            task.wait(0.1)
-                            VirtualInputManager:SendKeyEvent(false, "Q", false, game)
-                        end
-                    end
-                end
-            end)
-        end
-    end
-})
-
-CombatTab:CreateToggle({
-    Name = "Авто-способности",
-    CurrentValue = false,
-    Flag = "AutoAbility",
-    Callback = function(Value)
-        _G.AutoAbility = Value
-        while _G.AutoAbility and task.wait(1) do
-            VirtualInputManager:SendKeyEvent(true, "F", false, game)
-            task.wait(0.1)
-            VirtualInputManager:SendKeyEvent(false, "F", false, game)
-        end
-    end
-})
-
-CombatTab:CreateToggle({
-    Name = "Закрепить цель",
-    CurrentValue = false,
-    Flag = "AnchorTarget",
-    Callback = function(Value)
-        _G.AnchorTarget = Value
-        while _G.AnchorTarget and task.wait() do
-            pcall(function()
-                local target = FindNearestNPC()
-                if target and target:FindFirstChild("HumanoidRootPart") then
-                    target.HumanoidRootPart.Anchored = true
-                end
-            end)
-        end
-    end
-})
-
-VisualTab:CreateToggle({
-    Name = "Убрать туман",
-    CurrentValue = false,
-    Flag = "NoFog",
-    Callback = function(Value)
-        _G.NoFog = Value
-        if Value then
-            game:GetService("Lighting").FogEnd = 1000000
-        else
-            game:GetService("Lighting").FogEnd = 1000
-        end
-    end
-})
-
-VisualTab:CreateToggle({
-    Name = "Полная яркость",
-    CurrentValue = false,
-    Flag = "FullBright",
-    Callback = function(Value)
-        _G.FullBright = Value
-        if Value then
-            game:GetService("Lighting").GlobalShadows = false
-            game:GetService("Lighting").Brightness = 2
-        else
-            game:GetService("Lighting").GlobalShadows = true
-            game:GetService("Lighting").Brightness = 1
-        end
-    end
-})
-
-VisualTab:CreateToggle({
-    Name = "Звук попадания",
-    CurrentValue = false,
-    Flag = "HitSound",
-    Callback = function(Value)
-        _G.HitSound = Value
-    end
-})
-
-VisualTab:CreateToggle({
-    Name = "Трейл",
-    CurrentValue = false,
-    Flag = "TrailEnabled",
-    Callback = function(Value)
-        _G.TrailEnabled = Value
-        if Value then
-            CreateTrail()
-        else
-            RemoveTrail()
-        end
-    end
-})
-
-VisualTab:CreateToggle({
-    Name = "Таргет ESP",
-    CurrentValue = false,
-    Flag = "TargetESP",
-    Callback = function(Value)
-        _G.TargetESP = Value
-        if Value then
-            while _G.TargetESP and task.wait(1) do
-                RemoveTargetESP()
-                pcall(function()
-                    local target = FindNearestNPC()
-                    if target then
-                        CreateTargetESP(target)
-                    end
-                end)
-            end
-        else
-            RemoveTargetESP()
-        end
-    end
-})
-
-VisualTab:CreateToggle({
-    Name = "Китайская шляпа",
-    CurrentValue = false,
-    Flag = "ChineseHat",
-    Callback = function(Value)
-        _G.ChineseHat = Value
-        if Value then
-            CreateChineseHat()
-        else
-            RemoveChineseHat()
-        end
-    end
-})
-
-VisualTab:CreateToggle({
-    Name = "Прыжковый круг",
-    CurrentValue = false,
-    Flag = "JumpCircle",
-    Callback = function(Value)
-        _G.JumpCircle = Value
-    end
-})
-
-VisualTab:CreateColorPicker({
-    Name = "Цвет клиента",
-    Color = Color3.fromRGB(0, 255, 255),
-    Flag = "ClientColor",
-    Callback = function(Value)
-        _G.ClientColor = Value
-        if _G.TrailEnabled then
-            RemoveTrail()
-            CreateTrail()
-        end
-        if _G.ChineseHat then
-            RemoveChineseHat()
-            CreateChineseHat()
-        end
-    end
-})
-
-local FOVSlider = VisualTab:CreateSlider({
-    Name = "Поле зрения",
-    Range = {70, 120},
-    Increment = 1,
-    Suffix = "FOV",
-    CurrentValue = 70,
-    Flag = "FOVSlider",
-    Callback = function(Value)
-        _G.FOVValue = Value
-        if game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui") then
-            local camera = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Camera")
-            if camera then
-                camera.FieldOfView = _G.FOVValue
-            end
-        end
-    end
-})
-
-VisualTab:CreateToggle({
-    Name = "Спин-бот",
-    CurrentValue = false,
-    Flag = "SpinBot",
-    Callback = function(Value)
-        _G.SpinBot = Value
-        while _G.SpinBot and task.wait() do
-            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                LocalPlayer.Character.HumanoidRootPart.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(10), 0)
-            end
-        end
-    end
-})
-
-InfoTab:CreateLabel("XikiStudio v1.0")
-InfoTab:CreateLabel("by xikibamboni")
-InfoTab:CreateLabel("Используйте на свой страх и риск!")
-
-InfoTab:CreateButton({
-    Name = "Скопировать YouTube",
-    Callback = function()
-        setclipboard("https://www.youtube.com/@xikibamboni-ghost")
-        Rayfield:Notify({Title = "YouTube", Content = "Ссылка скопирована!", Duration = 3})
-    end
-})
-
-InfoTab:CreateButton({
-    Name = "Скопировать Discord",
-    Callback = function()
-        setclipboard("https://discord.gg/H3525BkxTC")
-        Rayfield:Notify({Title = "Discord", Content = "Ссылка скопирована!", Duration = 3})
-    end
-})
-
 LocalPlayer.CharacterAdded:Connect(function(character)
     character:WaitForChild("Humanoid")
-    if Rayfield.Flags["WalkSpeed"] then
+    if Rayfield.Flags and Rayfield.Flags["WalkSpeed"] then
         character.Humanoid.WalkSpeed = Rayfield.Flags["WalkSpeed"].CurrentValue
     end
-    if Rayfield.Flags["JumpPower"] then
+    if Rayfield.Flags and Rayfield.Flags["JumpPower"] then
         character.Humanoid.JumpPower = Rayfield.Flags["JumpPower"].CurrentValue
     end
     if _G.TrailEnabled then
@@ -1143,9 +1065,3 @@ RunService.Stepped:Connect(function()
         end
     end
 end)
-
-Rayfield:Notify({
-    Title = "XikiStudio загружен!",
-    Content = "Успешно внедрен. Удачного использования!",
-    Duration = 5,
-})
