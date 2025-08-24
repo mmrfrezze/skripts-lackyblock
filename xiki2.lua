@@ -8,6 +8,7 @@ local Workspace = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
 
 _G.AutoFarm = false
 _G.AutoQuest = false
@@ -35,6 +36,11 @@ _G.AnchorTarget = false
 _G.HitSound = false
 _G.CustomFOV = false
 _G.FOVValue = 70
+_G.AuraRange = 20
+_G.AuraActive = false
+_G.FlyPlatform = nil
+_G.Flying = false
+_G.FlySpeed = 50
 
 function FindNearestNPC()
     local closestNPC = nil
@@ -156,6 +162,103 @@ function mouse1click()
     VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 1)
 end
 
+function FlyToTarget(target, height)
+    if not target or not target:FindFirstChild("HumanoidRootPart") then return end
+    
+    local targetPos = target.HumanoidRootPart.Position
+    local flyPos = Vector3.new(targetPos.X, targetPos.Y + height, targetPos.Z)
+    
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local tween = TweenService:Create(
+            LocalPlayer.Character.HumanoidRootPart,
+            TweenInfo.new(0.5, Enum.EasingStyle.Linear),
+            {CFrame = CFrame.new(flyPos)}
+        )
+        tween:Play()
+        tween.Completed:Wait()
+        
+        local distance = (LocalPlayer.Character.HumanoidRootPart.Position - targetPos).Magnitude
+        if distance <= _G.AttackDistance then
+            mouse1click()
+        end
+    end
+end
+
+function CreateFlyPlatform()
+    if _G.FlyPlatform then _G.FlyPlatform:Destroy() end
+    
+    _G.FlyPlatform = Instance.new("Part")
+    _G.FlyPlatform.Size = Vector3.new(4, 0.5, 4)
+    _G.FlyPlatform.Transparency = 1
+    _G.FlyPlatform.Anchored = true
+    _G.FlyPlatform.CanCollide = true
+    _G.FlyPlatform.Name = "XikiFlyPlatform"
+    _G.FlyPlatform.Parent = Workspace
+    
+    return _G.FlyPlatform
+end
+
+function StartFlying()
+    _G.Flying = true
+    local platform = CreateFlyPlatform()
+    local bodyVelocity = Instance.new("BodyVelocity")
+    bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+    bodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
+    bodyVelocity.Parent = LocalPlayer.Character.HumanoidRootPart
+    
+    local flyConnection
+    flyConnection = RunService.Heartbeat:Connect(function()
+        if not _G.Flying or not LocalPlayer.Character then
+            flyConnection:Disconnect()
+            return
+        end
+        
+        local hrp = LocalPlayer.Character.HumanoidRootPart
+        local camera = Workspace.CurrentCamera
+        local moveDirection = Vector3.new(0, 0, 0)
+        
+        if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+            moveDirection = moveDirection + camera.CFrame.LookVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+            moveDirection = moveDirection - camera.CFrame.LookVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+            moveDirection = moveDirection - camera.CFrame.RightVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+            moveDirection = moveDirection + camera.CFrame.RightVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+            moveDirection = moveDirection + Vector3.new(0, 1, 0)
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then
+            moveDirection = moveDirection - Vector3.new(0, 1, 0)
+        end
+        
+        if moveDirection.Magnitude > 0 then
+            moveDirection = moveDirection.Unit * _G.FlySpeed
+        end
+        
+        bodyVelocity.Velocity = moveDirection
+        platform.CFrame = hrp.CFrame * CFrame.new(0, -3, 0)
+    end)
+end
+
+function StopFlying()
+    _G.Flying = false
+    if _G.FlyPlatform then
+        _G.FlyPlatform:Destroy()
+        _G.FlyPlatform = nil
+    end
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local bodyVelocity = LocalPlayer.Character.HumanoidRootPart:FindFirstChild("BodyVelocity")
+        if bodyVelocity then
+            bodyVelocity:Destroy()
+        end
+    end
+end
+
 local Window = Rayfield:CreateWindow({
     Name = "XikiStudio v1.0",
     LoadingTitle = "XikiStudio загружается...",
@@ -270,12 +373,14 @@ PlayerTab:CreateToggle({
 })
 
 PlayerTab:CreateToggle({
-    Name = "Полёт",
+    Name = "Полёт (WSAD+Space+Shift)",
     CurrentValue = false,
     Flag = "Fly",
     Callback = function(Value)
         if Value then
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/NickelHUBB/RobloxScript/main/Fly.lua"))()
+            StartFlying()
+        else
+            StopFlying()
         end
     end
 })
@@ -325,6 +430,18 @@ PlayerTab:CreateToggle({
     end
 })
 
+local FlySpeedSlider = PlayerTab:CreateSlider({
+    Name = "Скорость полета",
+    Range = {20, 200},
+    Increment = 5,
+    Suffix = "studs",
+    CurrentValue = 50,
+    Flag = "FlySpeed",
+    Callback = function(Value)
+        _G.FlySpeed = Value
+    end
+})
+
 local FarmHeightSlider = FarmTab:CreateSlider({
     Name = "Высота фарма",
     Range = {5, 50},
@@ -359,15 +476,7 @@ FarmTab:CreateToggle({
             pcall(function()
                 local target = FindNearestNPC()
                 if target and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                    local hrp = LocalPlayer.Character.HumanoidRootPart
-                    local targetPos = target.HumanoidRootPart.Position
-                    
-                    hrp.CFrame = CFrame.new(targetPos.X, targetPos.Y + _G.FarmHeight, targetPos.Z)
-                    
-                    local distance = (hrp.Position - targetPos).Magnitude
-                    if distance <= _G.AttackDistance then
-                        mouse1click()
-                    end
+                    FlyToTarget(target, _G.FarmHeight)
                 end
             end)
         end
@@ -532,6 +641,39 @@ TeleportTab:CreateDropdown({
     Callback = function(Option)
         TeleportToBoss(Option)
         Rayfield:Notify({Title = "Телепортация", Content = "Телепортация к " .. Option, Duration = 3})
+    end
+})
+
+local AuraRangeSlider = CombatTab:CreateSlider({
+    Name = "Дистанция ауры",
+    Range = {10, 50},
+    Increment = 1,
+    Suffix = "studs",
+    CurrentValue = 20,
+    Flag = "AuraRange",
+    Callback = function(Value)
+        _G.AuraRange = Value
+    end
+})
+
+CombatTab:CreateToggle({
+    Name = "Аура атаки",
+    CurrentValue = false,
+    Flag = "AttackAura",
+    Callback = function(Value)
+        _G.AuraActive = Value
+        while _G.AuraActive and task.wait(0.1) do
+            pcall(function()
+                for _, npc in pairs(Workspace.Enemies:GetChildren()) do
+                    if npc:FindFirstChild("Humanoid") and npc:FindFirstChild("HumanoidRootPart") then
+                        local distance = (LocalPlayer.Character.HumanoidRootPart.Position - npc.HumanoidRootPart.Position).Magnitude
+                        if distance <= _G.AuraRange then
+                            mouse1click()
+                        end
+                    end
+                end
+            end)
+        end
     end
 })
 
