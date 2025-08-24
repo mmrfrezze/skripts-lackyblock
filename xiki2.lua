@@ -7,6 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
+local Lighting = game:GetService("Lighting")
 
 _G.AutoFarm = false
 _G.AutoQuest = false
@@ -39,6 +40,39 @@ _G.AuraActive = false
 _G.FlyPlatform = nil
 _G.Flying = false
 _G.FlySpeed = 50
+_G.TrailEnabled = false
+_G.TargetESP = false
+_G.ChineseHat = false
+_G.JumpCircle = false
+_G.ClientColor = Color3.fromRGB(0, 255, 255)
+
+local correctKey = "H23F-RSF3-F33F-2FSA"
+local keyVerified = false
+
+local KeyWindow = Rayfield:CreateWindow({
+    Name = "XikiStudio - Key System",
+    LoadingTitle = "Проверка ключа...",
+    LoadingSubtitle = "by xikibamboni",
+    ConfigurationSaving = {Enabled = false},
+    KeySystem = true,
+    KeySettings = {
+        Title = "Система ключей",
+        Subtitle = "Введите ваш ключ",
+        Note = "Получите ключ в Discord",
+        FileName = "XikiKey",
+        SaveKey = true,
+        GrabKeyFromSite = false,
+        Key = {correctKey}
+    }
+})
+
+KeyWindow:Prompt({
+    Title = "Требуется ключ",
+    Subtitle = "Введите ключ для доступа к XikiStudio",
+    Content = "Ключ можно получить в нашем Discord сервере"
+})
+
+if not keyVerified then return end
 
 function FindNearestNPC()
     local closestNPC = nil
@@ -254,6 +288,120 @@ function StopFlying()
         if bodyVelocity then
             bodyVelocity:Destroy()
         end
+    end
+end
+
+function CreateTrail()
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local trail = Instance.new("Trail")
+        trail.Name = "XikiTrail"
+        trail.Color = ColorSequence.new(_G.ClientColor)
+        trail.Attachment0 = Instance.new("Attachment")
+        trail.Attachment0.Name = "TrailAttachment0"
+        trail.Attachment0.Parent = LocalPlayer.Character.HumanoidRootPart
+        trail.Attachment1 = Instance.new("Attachment")
+        trail.Attachment1.Name = "TrailAttachment1"
+        trail.Attachment1.Position = Vector3.new(0, 2, 0)
+        trail.Attachment1.Parent = LocalPlayer.Character.HumanoidRootPart
+        trail.Lifetime = 0.5
+        trail.Transparency = NumberSequence.new(0.5)
+        trail.Parent = LocalPlayer.Character.HumanoidRootPart
+    end
+end
+
+function RemoveTrail()
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local trail = LocalPlayer.Character.HumanoidRootPart:FindFirstChild("XikiTrail")
+        if trail then trail:Destroy() end
+        local att0 = LocalPlayer.Character.HumanoidRootPart:FindFirstChild("TrailAttachment0")
+        if att0 then att0:Destroy() end
+        local att1 = LocalPlayer.Character.HumanoidRootPart:FindFirstChild("TrailAttachment1")
+        if att1 then att1:Destroy() end
+    end
+end
+
+function CreateTargetESP(target)
+    if not target or not target:FindFirstChild("Head") then return end
+    
+    for i = 1, 2 do
+        local ghost = Instance.new("Part")
+        ghost.Name = "XikiTargetGhost"
+        ghost.Size = Vector3.new(1, 1, 1)
+        ghost.Shape = Enum.PartType.Ball
+        ghost.Material = Enum.Material.Neon
+        ghost.BrickColor = BrickColor.new(_G.ClientColor)
+        ghost.Transparency = 0.3
+        ghost.Anchored = true
+        ghost.CanCollide = false
+        ghost.Parent = target
+        
+        local weld = Instance.new("Weld")
+        weld.Part0 = target.Head
+        weld.Part1 = ghost
+        weld.C0 = CFrame.new(0, 2 + (i-1)*1.5, 0)
+        weld.Parent = ghost
+    end
+end
+
+function RemoveTargetESP()
+    for _, obj in pairs(Workspace:GetDescendants()) do
+        if obj.Name == "XikiTargetGhost" then
+            obj:Destroy()
+        end
+    end
+end
+
+function CreateChineseHat()
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Head") then
+        local hat = Instance.new("Part")
+        hat.Name = "XikiChineseHat"
+        hat.Size = Vector3.new(3, 0.5, 3)
+        hat.Shape = Enum.PartType.Cylinder
+        hat.Material = Enum.Material.Neon
+        hat.BrickColor = BrickColor.new(_G.ClientColor)
+        hat.Transparency = 0.5
+        hat.Anchored = false
+        hat.CanCollide = false
+        hat.Parent = LocalPlayer.Character
+        
+        local weld = Instance.new("Weld")
+        weld.Part0 = LocalPlayer.Character.Head
+        weld.Part1 = hat
+        weld.C0 = CFrame.new(0, 1.5, 0) * CFrame.Angles(0, 0, math.rad(90))
+        weld.Parent = hat
+        
+        local light = Instance.new("PointLight")
+        light.Name = "XikiHatLight"
+        light.Brightness = 5
+        light.Range = 15
+        light.Color = _G.ClientColor
+        light.Parent = hat
+    end
+end
+
+function RemoveChineseHat()
+    if LocalPlayer.Character then
+        local hat = LocalPlayer.Character:FindFirstChild("XikiChineseHat")
+        if hat then hat:Destroy() end
+    end
+end
+
+function CreateJumpCircle()
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local circle = Instance.new("Part")
+        circle.Name = "XikiJumpCircle"
+        circle.Size = Vector3.new(5, 0.2, 5)
+        circle.Shape = Enum.PartType.Cylinder
+        circle.Material = Enum.Material.Neon
+        circle.BrickColor = BrickColor.new(_G.ClientColor)
+        circle.Transparency = 0.7
+        circle.Anchored = true
+        circle.CanCollide = false
+        circle.Parent = Workspace
+        
+        circle.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, -3, 0) * CFrame.Angles(math.rad(90), 0, 0)
+        
+        game:GetService("Debris"):AddItem(circle, 1)
     end
 end
 
@@ -834,6 +982,82 @@ VisualTab:CreateToggle({
     end
 })
 
+VisualTab:CreateToggle({
+    Name = "Трейл",
+    CurrentValue = false,
+    Flag = "TrailEnabled",
+    Callback = function(Value)
+        _G.TrailEnabled = Value
+        if Value then
+            CreateTrail()
+        else
+            RemoveTrail()
+        end
+    end
+})
+
+VisualTab:CreateToggle({
+    Name = "Таргет ESP",
+    CurrentValue = false,
+    Flag = "TargetESP",
+    Callback = function(Value)
+        _G.TargetESP = Value
+        if Value then
+            while _G.TargetESP and task.wait(1) do
+                RemoveTargetESP()
+                pcall(function()
+                    local target = FindNearestNPC()
+                    if target then
+                        CreateTargetESP(target)
+                    end
+                end)
+            end
+        else
+            RemoveTargetESP()
+        end
+    end
+})
+
+VisualTab:CreateToggle({
+    Name = "Китайская шляпа",
+    CurrentValue = false,
+    Flag = "ChineseHat",
+    Callback = function(Value)
+        _G.ChineseHat = Value
+        if Value then
+            CreateChineseHat()
+        else
+            RemoveChineseHat()
+        end
+    end
+})
+
+VisualTab:CreateToggle({
+    Name = "Прыжковый круг",
+    CurrentValue = false,
+    Flag = "JumpCircle",
+    Callback = function(Value)
+        _G.JumpCircle = Value
+    end
+})
+
+VisualTab:CreateColorPicker({
+    Name = "Цвет клиента",
+    Color = Color3.fromRGB(0, 255, 255),
+    Flag = "ClientColor",
+    Callback = function(Value)
+        _G.ClientColor = Value
+        if _G.TrailEnabled then
+            RemoveTrail()
+            CreateTrail()
+        end
+        if _G.ChineseHat then
+            RemoveChineseHat()
+            CreateChineseHat()
+        end
+    end
+})
+
 local FOVSlider = VisualTab:CreateSlider({
     Name = "Поле зрения",
     Range = {70, 120},
@@ -893,6 +1117,20 @@ LocalPlayer.CharacterAdded:Connect(function(character)
     end
     if Rayfield.Flags["JumpPower"] then
         character.Humanoid.JumpPower = Rayfield.Flags["JumpPower"].CurrentValue
+    end
+    if _G.TrailEnabled then
+        task.wait(1)
+        CreateTrail()
+    end
+    if _G.ChineseHat then
+        task.wait(1)
+        CreateChineseHat()
+    end
+end)
+
+LocalPlayer.Character:WaitForChild("Humanoid").Jumping:Connect(function()
+    if _G.JumpCircle then
+        CreateJumpCircle()
     end
 end)
 
