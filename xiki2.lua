@@ -295,25 +295,50 @@ function CreateTargetESP(target)
     
     local ghost1 = Instance.new("Part")
     ghost1.Name = "XikiGhost1"
-    ghost1.Size = Vector3.new(2, 2, 2)
+    ghost1.Size = Vector3.new(1.5, 1.5, 1.5) -- Уменьшен размер
     ghost1.Shape = Enum.PartType.Ball
     ghost1.Material = Enum.Material.Neon
     ghost1.BrickColor = BrickColor.new(_G.ClientColor)
-    ghost1.Transparency = 0.3
+    ghost1.Transparency = 0.2
     ghost1.Anchored = true
     ghost1.CanCollide = false
     ghost1.Parent = Workspace
     
     local ghost2 = Instance.new("Part")
     ghost2.Name = "XikiGhost2"
-    ghost2.Size = Vector3.new(2, 2, 2)
+    ghost2.Size = Vector3.new(1.5, 1.5, 1.5) -- Уменьшен размер
     ghost2.Shape = Enum.PartType.Ball
     ghost2.Material = Enum.Material.Neon
     ghost2.BrickColor = BrickColor.new(_G.ClientColor)
-    ghost2.Transparency = 0.3
+    ghost2.Transparency = 0.2
     ghost2.Anchored = true
     ghost2.CanCollide = false
     ghost2.Parent = Workspace
+    
+    -- Следы для призраков
+    local trail1 = Instance.new("Trail")
+    trail1.Attachment0 = Instance.new("Attachment")
+    trail1.Attachment0.Parent = ghost1
+    trail1.Attachment1 = Instance.new("Attachment")
+    trail1.Attachment1.Parent = ghost1
+    trail1.Attachment1.Position = Vector3.new(0, 0.5, 0)
+    trail1.Color = ColorSequence.new(_G.ClientColor)
+    trail1.LightEmission = 1
+    trail1.Transparency = NumberSequence.new(0.7)
+    trail1.Lifetime = 0.3
+    trail1.Parent = ghost1
+    
+    local trail2 = Instance.new("Trail")
+    trail2.Attachment0 = Instance.new("Attachment")
+    trail2.Attachment0.Parent = ghost2
+    trail2.Attachment1 = Instance.new("Attachment")
+    trail2.Attachment1.Parent = ghost2
+    trail2.Attachment1.Position = Vector3.new(0, 0.5, 0)
+    trail2.Color = ColorSequence.new(_G.ClientColor)
+    trail2.LightEmission = 1
+    trail2.Transparency = NumberSequence.new(0.7)
+    trail2.Lifetime = 0.3
+    trail2.Parent = ghost2
     
     local connection
     connection = RunService.Heartbeat:Connect(function()
@@ -325,9 +350,11 @@ function CreateTargetESP(target)
         end
         
         local pos = target.HumanoidRootPart.Position
-        local time = tick()
-        ghost1.CFrame = CFrame.new(pos + Vector3.new(math.sin(time * 2) * 3, 2, math.cos(time * 2) * 3))
-        ghost2.CFrame = CFrame.new(pos + Vector3.new(math.cos(time * 2) * 3, 2, math.sin(time * 2) * 3))
+        local time = tick() * 3 -- Увеличена скорость вращения в 3 раза
+        
+        -- Увеличена дистанция от цели (5 вместо 3)
+        ghost1.CFrame = CFrame.new(pos + Vector3.new(math.sin(time * 2) * 5, 3, math.cos(time * 2) * 5))
+        ghost2.CFrame = CFrame.new(pos + Vector3.new(math.cos(time * 2) * 5, 3, math.sin(time * 2) * 5))
     end)
 end
 
@@ -341,30 +368,78 @@ end
 
 function CreateChineseHat()
     if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Head") then
-        local hat = Instance.new("Part")
-        hat.Name = "XikiChineseHat"
-        hat.Size = Vector3.new(3, 0.5, 3)
-        hat.Shape = Enum.PartType.Cylinder
-        hat.Material = Enum.Material.Neon
-        hat.BrickColor = BrickColor.new(_G.ClientColor)
-        hat.Transparency = 0.5
-        hat.Anchored = false
-        hat.CanCollide = false
+        -- Основа шляпы
+        local hatBase = Instance.new("Part")
+        hatBase.Name = "XikiChineseHatBase"
+        hatBase.Size = Vector3.new(3, 0.2, 3)
+        hatBase.Shape = Enum.PartType.Cylinder
+        hatBase.Material = Enum.Material.Neon
+        hatBase.BrickColor = BrickColor.new(_G.ClientColor)
+        hatBase.Transparency = 0.3
+        hatBase.Anchored = false
+        hatBase.CanCollide = false
         
-        local weld = Instance.new("Weld")
-        weld.Part0 = LocalPlayer.Character.Head
-        weld.Part1 = hat
-        weld.C0 = CFrame.new(0, 1.5, 0) * CFrame.Angles(0, 0, math.rad(90))
-        weld.Parent = hat
+        -- Конус шляпы
+        local hatCone = Instance.new("Part")
+        hatCone.Name = "XikiChineseHatCone"
+        hatCone.Size = Vector3.new(2, 1.5, 2)
+        hatCone.Shape = Enum.PartType.Cylinder
+        hatCone.Material = Enum.Material.Neon
+        hatCone.BrickColor = BrickColor.new(_G.ClientColor)
+        hatCone.Transparency = 0.3
+        hatCone.Anchored = false
+        hatCone.CanCollide = false
         
-        hat.Parent = LocalPlayer.Character
+        -- Верхушка шляпы
+        local hatTop = Instance.new("Part")
+        hatTop.Name = "XikiChineseHatTop"
+        hatTop.Size = Vector3.new(0.5, 0.5, 0.5)
+        hatTop.Shape = Enum.PartType.Ball
+        hatTop.Material = Enum.Material.Neon
+        hatTop.BrickColor = BrickColor.new(_G.ClientColor)
+        hatTop.Transparency = 0.2
+        hatTop.Anchored = false
+        hatTop.CanCollide = false
+        
+        -- Крепление основы
+        local weldBase = Instance.new("Weld")
+        weldBase.Part0 = LocalPlayer.Character.Head
+        weldBase.Part1 = hatBase
+        weldBase.C0 = CFrame.new(0, 0.6, 0) * CFrame.Angles(0, 0, math.rad(90))
+        weldBase.Parent = hatBase
+        
+        -- Крепление конуса
+        local weldCone = Instance.new("Weld")
+        weldCone.Part0 = hatBase
+        weldCone.Part1 = hatCone
+        weldCone.C0 = CFrame.new(0, -0.8, 0)
+        weldCone.Parent = hatCone
+        
+        -- Крепление верхушки
+        local weldTop = Instance.new("Weld")
+        weldTop.Part0 = hatCone
+        weldTop.Part1 = hatTop
+        weldTop.C0 = CFrame.new(0, -1.2, 0)
+        weldTop.Parent = hatTop
+        
+        hatBase.Parent = LocalPlayer.Character
+        hatCone.Parent = LocalPlayer.Character
+        hatTop.Parent = LocalPlayer.Character
+        
+        -- Свечение
+        local pointLight = Instance.new("PointLight")
+        pointLight.Name = "XikiHatLight"
+        pointLight.Color = _G.ClientColor
+        pointLight.Brightness = 2
+        pointLight.Range = 5
+        pointLight.Parent = hatTop
     end
 end
 
 function RemoveChineseHat()
     if LocalPlayer.Character then
         for _, obj in pairs(LocalPlayer.Character:GetChildren()) do
-            if obj.Name == "XikiChineseHat" then
+            if obj.Name == "XikiChineseHatBase" or obj.Name == "XikiChineseHatCone" or obj.Name == "XikiChineseHatTop" then
                 obj:Destroy()
             end
         end
