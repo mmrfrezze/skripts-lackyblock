@@ -1063,3 +1063,8 @@ RunService.Stepped:Connect(function()
         end
     end
 end)
+Rayfield:Notify({
+    Title = "XikiStudio загружен!",
+    Content = "Успешно внедрен. Удачного использования!",
+    Duration = 5,
+})
