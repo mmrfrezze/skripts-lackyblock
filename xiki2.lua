@@ -7,6 +7,95 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
+-- Система проверки ключа
+local correctKey = "ED31-1DWF-12DA-1RFS"
+local keyVerified = false
+
+-- Создаем интерфейс для ввода ключа
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "KeyVerificationGui"
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 400, 0, 200)
+frame.Position = UDim2.new(0.5, -200, 0.5, -100)
+frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+frame.BorderSizePixel = 0
+frame.Parent = screenGui
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(0, 400, 0, 50)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+title.Text = "XikiStudio - Проверка ключа"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextSize = 20
+title.Font = Enum.Font.GothamBold
+title.Parent = frame
+
+local inputBox = Instance.new("TextBox")
+inputBox.Size = UDim2.new(0, 300, 0, 40)
+inputBox.Position = UDim2.new(0.5, -150, 0.5, -20)
+inputBox.PlaceholderText = "Введите ключ доступа..."
+inputBox.Text = ""
+inputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+inputBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+inputBox.TextSize = 16
+inputBox.Parent = frame
+
+local submitButton = Instance.new("TextButton")
+submitButton.Size = UDim2.new(0, 120, 0, 35)
+submitButton.Position = UDim2.new(0.5, -60, 0.7, 0)
+submitButton.Text = "Проверить ключ"
+submitButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+submitButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+submitButton.TextSize = 16
+submitButton.Parent = frame
+
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Size = UDim2.new(0, 300, 0, 20)
+statusLabel.Position = UDim2.new(0.5, -150, 0.85, 0)
+statusLabel.Text = ""
+statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+statusLabel.BackgroundTransparency = 1
+statusLabel.TextSize = 14
+statusLabel.Parent = frame
+
+-- Функция проверки ключа
+local function verifyKey()
+    local enteredKey = inputBox.Text:gsub("%s+", ""):upper()
+    
+    if enteredKey == correctKey then
+        keyVerified = true
+        statusLabel.Text = "Ключ верный! Загрузка..."
+        statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+        wait(1)
+        screenGui:Destroy()
+        return true
+    else
+        statusLabel.Text = "Неверный ключ! Попробуйте снова."
+        statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+        return false
+    end
+end
+
+-- Обработчик нажатия кнопки
+submitButton.MouseButton1Click:Connect(verifyKey)
+
+-- Обработчик нажатия Enter в текстовом поле
+inputBox.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        verifyKey()
+    end
+end)
+
+-- Ждем пока ключ будет верифицирован
+repeat
+    wait(0.1)
+until keyVerified
+
+-- Продолжаем выполнение основного скрипта
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 _G.AutoFarm = false
 _G.AutoQuest = false
