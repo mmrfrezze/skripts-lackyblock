@@ -7,6 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
+
 -- Система проверки ключа
 local correctKey = "ED31-1DWF-12DA-1RFS"
 local keyVerified = false
